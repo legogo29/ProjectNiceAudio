@@ -7,7 +7,7 @@
 
 ## [Overview](id:section-features)
 
-This repository contains the full software we developed to control a PLC board which is designed and created by our professor Martijn Oldenburg. The authors who worked on this project are Youri Klaassens, Tim Blank and Thomas Jansema. 
+This repository contains the full software we developed to control a PCB which is designed and created by our professor Martijn Oldenburg. The authors who worked on this project are Youri Klaassens, Tim Blank and Thomas Jansema. 
 
 
 The requirements of the client were:
