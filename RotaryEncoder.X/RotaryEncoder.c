@@ -30,6 +30,7 @@ void main() {
     
     ANSELHbits.ANS11    = 0;                        /* Define pin 37 as a digital input */                             
     ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
+    ANSEL               = 0;                        //define low anaog pins as digital
     
     INTCONbits.GIE      = 1;                        /* Enable global interrupts */
     INTCONbits.PEIE     = 0;                        // Disables all peripheral interrupts
@@ -67,9 +68,11 @@ void interrupt ISR()
                 PORTA = PORTA << 1;
                 break;
             case 1:                                 /* The rotary encoder went contra clockwise */
-                PORTA = PORTA << 1;
-                PORTAbits.RA0 = 1;
-                //if(PORTA && 0x0f == 0) PORTAbits.RA3 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                PORTA = PORTA >> 1;
+                //PORTAbits.RA0 = 1;
+                if(PORTA == 0) {
+                    PORTAbits.RA3 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                }
                 break;
         }
         INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
