@@ -32,81 +32,54 @@
 #define BACKWARD 1                                  //define variables FORWARD and BACKWARD
 #define FORWARD 0
 
-void rotary_encoder();
-/*
- * 
- */
 void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
     
-    TRISBbits.TRISB4 = 1;                           //pin B4 and B5 as input
-    TRISBbits.TRISB5 = 1;
+    TRISA               = 0;                        /* Define all RA pins as an output */
+    PORTAbits.RA3       = 1;                        /* Turn on LED number 4 */
     
-    TRISA = 0x00;                                   //set the A resiter as output pins
-    PORTA = 0;
+    TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
+    TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
     
-  
-    while (1) {
-        rotary_encoder();
+    ANSELbits.ANS4      = 0;                        /* Define pin 37 as a digital input */                             
+    ANSELbits.ANS5      = 0;                        /* Define pin 38 as a digital input */
+    
+    INTCONbits.INTE     = 1;                        /* Enable external interrupt */
+    INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
+    INTCONbits.GIE      = 1;                        /* Enable global interrupts */
+    IOCBbits.IOCB4      = 1;                        /* Cause IOC for pin 37 */
+    
+    
+    while(1)
+    {
+        /* We usually do other tasks here */
     }
     
 }
 
-void rotary_encoder() {
-    char pin_a = PORTBbits.RB4;
-    char pin_b = PORTBbits.RB5;
-    int direction_current;
-    int transistor_current;
-    int direction_previous;
-    
-    if(pin_a == 0 && pin_b == 0)
+void interrupt ISR()
+{
+    if(INTCONbits.INTF)                             /* Is the interrupt caused by external interrupt on PORTB? */
     {
-        direction_current = BACKWARD;
-    }
-    else if(pin_a == 0 && pin_b == 1)
-    {
-        direction_current = FORWARD;
-    }
-    else 
-    {
-        return;
-    }
-
-    // keuze uit forward of backward procedure
-    // wanneer direction = forward
-    if(direction_current == FORWARD)
-    {
-        if(transistor_current == 4)
+        bit value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+        
+        switch(value)                               /* Determine the direction of the rotary encoer */
         {
-            transistor_current = 1;
-            PORTA = 1;
-            direction_previous = direction_current;
-            direction_current = -1;
+            case 0:                                 /* The rotary encoder went clockwise */
+                if(PORTAbits.RA3)
+                {
+                    PORTAbits.RA3 = 0;
+                    PORTAbits.RA0 = 1;
+                    break;
+                }
+                PORTA = PORTA << 1;
+                break;
+            case 1:                                 /* The rotary encoder went contra clockwise */
+                PORTA = PORTA << 1;
+                if(STATUSbits.C) PORTAbits.RA3 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                break;
         }
-        else
-        {
-            transistor_current = transistor_current +1;
-            PORTA = PORTA << 1;
-            direction_previous = direction_current;
-            direction_current = -1;
-        }
-    }
-    // wanneer direction = backward
-    else if(direction_current == BACKWARD)
-    {
-        if(transistor_current == 1)
-        {
-            transistor_current = 4;
-            PORTA = 0b1000;
-            direction_previous = direction_current;
-            direction_current = -1;
-        }
-        else
-        {
-            transistor_current = transistor_current -1;
-            PORTA = PORTA >> 1;
-            direction_previous = direction_current;
-            direction_current = -1;
-        }
+        INTCONbits.INTF = 0;                        /* Clear the interrupt flag for PORTB
+                                                     * This causes that we leave the ISR and new interrupts are welcome */
     }
 }
