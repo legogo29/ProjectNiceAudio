@@ -50,3 +50,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/RotaryEncoder.X/nbproject/private/
+/RotaryEncoder.X/dist/default/
+/RotaryEncoder.X/build/default/
