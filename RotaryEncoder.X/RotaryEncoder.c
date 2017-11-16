@@ -23,7 +23,7 @@ void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
     
     TRISA               = 0;                        /* Define all RA pins as an output */
-    PORTAbits.RA3       = 1;                        /* Turn on LED number 4 */
+    PORTA               = 1;                        /* Turn on LED number 1 */
     
     TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
     TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
@@ -31,9 +31,13 @@ void main() {
     ANSELHbits.ANS11    = 0;                        /* Define pin 37 as a digital input */                             
     ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
     
-    INTCONbits.INTE     = 1;                        /* Enable external interrupt */
-    INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
     INTCONbits.GIE      = 1;                        /* Enable global interrupts */
+    INTCONbits.PEIE     = 0;                        // Disables all peripheral interrupts
+    INTCONbits.T0IE     = 0;                        // Disables the Timer0 interrupt
+    INTCONbits.INTE     = 0;                        // Disables the INT external interrupt
+    INTCONbits.RBIE     = 1;                        // Enables the PORTB change interrupt
+    INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
+    INTCONbits.RBIF     = 0;                        // clear flag
     IOCBbits.IOCB4      = 1;                        /* Cause IOC for pin 37 */
     
     
@@ -47,7 +51,7 @@ void main() {
 
 void interrupt ISR()
 {
-    if(INTCONbits.INTF)                             /* Is the interrupt caused by external interrupt on PORTB? */
+    if(PORTBbits.RB4)                             /* Is the interrupt caused by external interrupt on PORTB? */
     {
         int value   = PORTBbits.RB5;         /* Isolate the measured voltage on pin 38 (rotary B) */
         
@@ -64,10 +68,13 @@ void interrupt ISR()
                 break;
             case 1:                                 /* The rotary encoder went contra clockwise */
                 PORTA = PORTA << 1;
-                if(STATUSbits.C) PORTAbits.RA3 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                PORTAbits.RA0 = 1;
+                //if(PORTA && 0x0f == 0) PORTAbits.RA3 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
                 break;
         }
-        INTCONbits.INTF = 0;                        /* Clear the interrupt flag for PORTB
+        INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
                                                      * This causes that we leave the ISR and new interrupts are welcome */
     }
+        INTCONbits.INTF = 0;                        /* Clear interrupt flag */
+
 }
