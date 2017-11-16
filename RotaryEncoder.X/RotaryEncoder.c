@@ -29,12 +29,67 @@
 #include <xc.h>                                     //PIC hardware mapping
 #define _XTAL_FREQ 500000                           //Used by the XC8 delay_ms(x) macro
 
+#define BACKWARD 1                                  //define variables FORWARD and BACKWARD
+#define FORWARD 0
+
 /*
  * 
  */
 void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
+    
+    char pin_a = PORTBbits.RB4;
+    char pin_b = PORTBbits.RB5;
+    int direction_current;
+    int transistor_current;
+    int direction_previous;
+    
+    if(pin_a == 0 && pin_b == 0)
+    {
+        direction_current = BACKWARD;
+    }
+    else if(pin_a == 0 && pin_b == 1)
+    {
+        direction_current = FORWARD;
+    }
+    else 
+    {
+        return;
+    }
 
+    // keuze uit forward of backward procedure
+    // wanneer direction = forward
+    if(direction_current == FORWARD)
+    {
+        if(transistor_current == 4)
+        {
+            transistor_current = 1;
+            direction_previous = direction_current;
+            direction_current = -1;
+        }
+        else
+        {
+            transistor_current = transistor_current +1;
+            direction_previous = direction_current;
+            direction_current = -1;
+        }
+    }
+    // wanneer direction = backward
+    else if(direction_current == BACKWARD)
+    {
+        if(transistor_current == 1)
+        {
+            transistor_current = 4;
+            direction_previous = direction_current;
+            direction_current = -1;
+        }
+        else
+        {
+            transistor_current = transistor_current -1;
+            direction_previous = direction_current;
+            direction_current = -1;
+        }
+    }
     
 }
 
