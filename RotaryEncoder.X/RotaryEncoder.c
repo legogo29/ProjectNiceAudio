@@ -32,12 +32,26 @@
 #define BACKWARD 1                                  //define variables FORWARD and BACKWARD
 #define FORWARD 0
 
+void rotary_encoder();
 /*
  * 
  */
 void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
     
+    TRISBbits.TRISB4 = 1;                           //pin B4 and B5 as input
+    TRISBbits.TRISB5 = 1;
+    
+    TRISA = 0x00;                                   //set the A resiter as output pins
+    
+  
+    while (1) {
+        rotary_encoder();
+    }
+    
+}
+
+void rotary_encoder() {
     char pin_a = PORTBbits.RB4;
     char pin_b = PORTBbits.RB5;
     int direction_current;
@@ -64,12 +78,14 @@ void main() {
         if(transistor_current == 4)
         {
             transistor_current = 1;
+            PORTA = 1;
             direction_previous = direction_current;
             direction_current = -1;
         }
         else
         {
             transistor_current = transistor_current +1;
+            PORTA = PORTA << 1;
             direction_previous = direction_current;
             direction_current = -1;
         }
@@ -80,16 +96,16 @@ void main() {
         if(transistor_current == 1)
         {
             transistor_current = 4;
+            PORTA = 0b1000;
             direction_previous = direction_current;
             direction_current = -1;
         }
         else
         {
             transistor_current = transistor_current -1;
+            PORTA = PORTA >> 1;
             direction_previous = direction_current;
             direction_current = -1;
         }
     }
-    
 }
-
