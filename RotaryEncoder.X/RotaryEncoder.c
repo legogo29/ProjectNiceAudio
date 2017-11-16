@@ -43,6 +43,7 @@ void main() {
     TRISBbits.TRISB5 = 1;
     
     TRISA = 0x00;                                   //set the A resiter as output pins
+    PORTA = 0;
     
   
     while (1) {
