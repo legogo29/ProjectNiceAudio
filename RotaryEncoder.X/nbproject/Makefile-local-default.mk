@@ -14,23 +14,23 @@
 # You can invoke make with the values of the macros:
 # $ makeMP_CC="/opt/microchip/mplabc30/v3.30c/bin/pic30-gcc" ...  
 #
-PATH_TO_IDE_BIN=/opt/microchip/mplabx/v4.01/mplab_ide/platform/../mplab_ide/modules/../../bin/
+PATH_TO_IDE_BIN=/opt/microchip/mplabx/v4.05/mplab_ide/platform/../mplab_ide/modules/../../bin/
 # Adding MPLAB X bin directory to path.
-PATH:=/opt/microchip/mplabx/v4.01/mplab_ide/platform/../mplab_ide/modules/../../bin/:$(PATH)
+PATH:=/opt/microchip/mplabx/v4.05/mplab_ide/platform/../mplab_ide/modules/../../bin/:$(PATH)
 # Path to java used to run MPLAB X when this makefile was created
-MP_JAVA_PATH="/opt/microchip/mplabx/v4.01/sys/java/jre1.8.0_141/bin/"
+MP_JAVA_PATH="/usr/lib64/jvm/java-1.8.0-openjdk-1.8.0/jre/bin/"
 OS_CURRENT="$(shell uname -s)"
-MP_CC="/opt/microchip/xc8/v1.43/bin/xc8"
+MP_CC="/opt/microchip/xc8/v1.44/bin/xc8"
 # MP_CPPC is not defined
 # MP_BC is not defined
-MP_AS="/opt/microchip/xc8/v1.43/bin/xc8"
-MP_LD="/opt/microchip/xc8/v1.43/bin/xc8"
+MP_AS="/opt/microchip/xc8/v1.44/bin/xc8"
+MP_LD="/opt/microchip/xc8/v1.44/bin/xc8"
 # MP_AR is not defined
-DEP_GEN=${MP_JAVA_PATH}java -jar "/opt/microchip/mplabx/v4.01/mplab_ide/platform/../mplab_ide/modules/../../bin/extractobjectdependencies.jar"
-MP_CC_DIR="/opt/microchip/xc8/v1.43/bin"
+DEP_GEN=${MP_JAVA_PATH}java -jar "/opt/microchip/mplabx/v4.05/mplab_ide/platform/../mplab_ide/modules/../../bin/extractobjectdependencies.jar"
+MP_CC_DIR="/opt/microchip/xc8/v1.44/bin"
 # MP_CPPC_DIR is not defined
 # MP_BC_DIR is not defined
-MP_AS_DIR="/opt/microchip/xc8/v1.43/bin"
-MP_LD_DIR="/opt/microchip/xc8/v1.43/bin"
+MP_AS_DIR="/opt/microchip/xc8/v1.44/bin"
+MP_LD_DIR="/opt/microchip/xc8/v1.44/bin"
 # MP_AR_DIR is not defined
 # MP_BC_DIR is not defined
