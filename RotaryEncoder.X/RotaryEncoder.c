@@ -28,8 +28,8 @@ void main() {
     TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
     TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
     
-    ANSELbits.ANS4      = 0;                        /* Define pin 37 as a digital input */                             
-    ANSELbits.ANS5      = 0;                        /* Define pin 38 as a digital input */
+    ANSELHbits.ANS11    = 0;                        /* Define pin 37 as a digital input */                             
+    ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
     
     INTCONbits.INTE     = 1;                        /* Enable external interrupt */
     INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
@@ -39,7 +39,8 @@ void main() {
     
     while(1)
     {
-        /* We usually do other tasks here */
+        /* We usually do other tasks here, delay until there is something here */
+        __delay_us(50);
     }
     
 }
@@ -48,7 +49,7 @@ void interrupt ISR()
 {
     if(INTCONbits.INTF)                             /* Is the interrupt caused by external interrupt on PORTB? */
     {
-        bit value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+        int value   = PORTBbits.RB5;         /* Isolate the measured voltage on pin 38 (rotary B) */
         
         switch(value)                               /* Determine the direction of the rotary encoer */
         {
