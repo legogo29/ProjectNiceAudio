@@ -29,8 +29,6 @@
 #include <xc.h>                                     //PIC hardware mapping
 #define _XTAL_FREQ 500000                           //Used by the XC8 delay_ms(x) macro
 
-#define BACKWARD 1                                  //define variables FORWARD and BACKWARD
-#define FORWARD 0
 
 void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
