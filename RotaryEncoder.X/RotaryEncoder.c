@@ -23,25 +23,28 @@ void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
     
     TRISA               = 0;                        /* Define all RA pins as an output */
-    PORTA               = ~1;                        /* Turn on LED number 1 */
+    PORTA               = ~1;                       /* Turn on Input number 1 */
     
     TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
     TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
     
     ANSELHbits.ANS11    = 0;                        /* Define pin 37 as a digital input */                             
     ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
-    ANSEL               = 0;                        //define low anaog pins as digital
+    ANSEL               = 0;                        // define low anaog pins as digital, these corrospond to digital pins RA0-RA3, RA5 and RE0-RE2
     
+    PORTB               = 0x30;                      // Preset the output values, so the interrupt won't trigger
+
     INTCONbits.GIE      = 0;                        /* Disables global interrupts */
     INTCONbits.PEIE     = 0;                        // Disables all peripheral interrupts
     INTCONbits.T0IE     = 0;                        // Disables the Timer0 interrupt
     INTCONbits.INTE     = 0;                        // Disables the INT external interrupt
-    INTCONbits.RBIE     = 1;                        // Enables the PORTB change interrupt
+    INTCONbits.RBIE     = 0;                        // Disables the PORTB change interrupt
     INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
     INTCONbits.RBIF     = 0;                        // clear flag
     IOCBbits.IOCB4      = 1;                        /* Cause IOC for pin 37 */
     
-    INTCONbits.GIE      = 1;                        /* Enable global interrupts */
+    INTCONbits.RBIE     = 1;                        // Enables the PORTB change interrupt
+    INTCONbits.GIE      = 1;                        /* Enable global interrupts, this should happen after all other setup */
 
     
     
@@ -55,31 +58,31 @@ void main() {
 
 void interrupt ISR()
 {
-    if(PORTBbits.RB4)                             /* Is the interrupt caused by external interrupt on PORTB? */
+    if(PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
     {
-        int value   = PORTBbits.RB5;         /* Isolate the measured voltage on pin 38 (rotary B) */
+        int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
         
         switch(value)                               /* Determine the direction of the rotary encoer */
         {
             case 0:                                 /* The rotary encoder went clockwise */
-                if(!PORTAbits.RA3)
+                if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
                 {
-                    PORTAbits.RA3 = 1;
+                    PORTAbits.RA3 = 1;              // manualy set the new condition
                     PORTAbits.RA0 = 0;
-                    break;
+                    break;                          // we won't continue to bitshift, because we are already in the desired state
                 }
                 PORTA = PORTA << 1;
-                PORTAbits.RA0 = 1;
+                PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                 break;
             case 1:                                 /* The rotary encoder went contra clockwise */
                 
-                PORTA = PORTA >> 1;
-                if((PORTA & 0x0f) == 0x0f) {
-                    PORTAbits.RA0 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
+                    PORTAbits.RA0 = 1;              // manualy set the new condition
                     PORTAbits.RA3 = 0;
+                    break;                          // we won't continue to bitshift, because we are already in the desired state
                 }
-                //PORTAbits.RA0 = 1;
-                PORTAbits.RA7 = 1;
+                PORTA = PORTA >> 1;
+                PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                 break;
         }
         INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
