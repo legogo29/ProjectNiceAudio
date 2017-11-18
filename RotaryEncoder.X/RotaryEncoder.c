@@ -23,7 +23,7 @@ void main() {
     OSCCON = 0b00110001;                            //500KHz clock speed
     
     TRISA               = 0;                        /* Define all RA pins as an output */
-    PORTA               = 1;                        /* Turn on LED number 1 */
+    PORTA               = ~1;                        /* Turn on LED number 1 */
     
     TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
     TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
@@ -32,7 +32,7 @@ void main() {
     ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
     ANSEL               = 0;                        //define low anaog pins as digital
     
-    INTCONbits.GIE      = 1;                        /* Enable global interrupts */
+    INTCONbits.GIE      = 0;                        /* Disables global interrupts */
     INTCONbits.PEIE     = 0;                        // Disables all peripheral interrupts
     INTCONbits.T0IE     = 0;                        // Disables the Timer0 interrupt
     INTCONbits.INTE     = 0;                        // Disables the INT external interrupt
@@ -40,6 +40,9 @@ void main() {
     INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
     INTCONbits.RBIF     = 0;                        // clear flag
     IOCBbits.IOCB4      = 1;                        /* Cause IOC for pin 37 */
+    
+    INTCONbits.GIE      = 1;                        /* Enable global interrupts */
+
     
     
     while(1)
@@ -59,20 +62,24 @@ void interrupt ISR()
         switch(value)                               /* Determine the direction of the rotary encoer */
         {
             case 0:                                 /* The rotary encoder went clockwise */
-                if(PORTAbits.RA3)
+                if(!PORTAbits.RA3)
                 {
-                    PORTAbits.RA3 = 0;
-                    PORTAbits.RA0 = 1;
+                    PORTAbits.RA3 = 1;
+                    PORTAbits.RA0 = 0;
                     break;
                 }
                 PORTA = PORTA << 1;
+                PORTAbits.RA0 = 1;
                 break;
             case 1:                                 /* The rotary encoder went contra clockwise */
+                
                 PORTA = PORTA >> 1;
-                //PORTAbits.RA0 = 1;
-                if(PORTA == 0) {
-                    PORTAbits.RA3 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                if((PORTA & 0x0f) == 0x0f) {
+                    PORTAbits.RA0 = 1; /* Turn LED 4 on if we switched from LED 1 to "Led 0" */
+                    PORTAbits.RA3 = 0;
                 }
+                //PORTAbits.RA0 = 1;
+                PORTAbits.RA7 = 1;
                 break;
         }
         INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
