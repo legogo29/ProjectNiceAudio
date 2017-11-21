@@ -58,13 +58,13 @@ void main() {
 
 void interrupt ISR()
 {
-    if(PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
+    if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
     {
         int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
         
         switch(value)                               /* Determine the direction of the rotary encoer */
         {
-            case 0:                                 /* The rotary encoder went clockwise */
+            case 1:                                 /* The rotary encoder went clockwise */
                 if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
                 {
                     PORTAbits.RA3 = 1;              // manualy set the new condition
@@ -74,7 +74,7 @@ void interrupt ISR()
                 PORTA = PORTA << 1;
                 PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                 break;
-            case 1:                                 /* The rotary encoder went contra clockwise */
+            case 0:                                 /* The rotary encoder went contra clockwise */
                 
                 if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
                     PORTAbits.RA0 = 1;              // manualy set the new condition
