@@ -6,7 +6,7 @@
             <name>ADC</name>
             <creation-uuid>ce85cfde-f8ca-4fc6-a6be-ff6c9bf53891</creation-uuid>
             <make-project-type>0</make-project-type>
-            <c-extensions/>
+            <c-extensions>c</c-extensions>
             <cpp-extensions/>
             <header-extensions/>
             <asminc-extensions/>

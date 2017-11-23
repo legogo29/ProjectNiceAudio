@@ -41,7 +41,7 @@ void main() {
     INTCONbits.RBIE     = 0;                        // Disables the PORTB change interrupt
     INTCONbits.INTF     = 0;                        /* Clear flag while flashing */
     INTCONbits.RBIF     = 0;                        // clear flag
-    IOCB                = 0;                        //
+    IOCB                = 0;                        // Clear IOCB register,
     IOCBbits.IOCB4      = 1;                        /* Cause IOC for pin 37 */
     
     INTCONbits.RBIE     = 1;                        // Enables the PORTB change interrupt
