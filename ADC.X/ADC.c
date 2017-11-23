@@ -52,11 +52,11 @@ void main()
         if (!GO)
         {
             GO = 1;
-            short analog_result = ADRESH << 8 | ADRESL;
+            short analog_result = ((short) ADRESH << 8) | ADRESL;
             for (char i = 0; i < NUMBER_OF_LEDS; i++) {                 //iterate through the LEDS
                 if (analog_result > (STEPSIZE * (i+1) + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
                     PORTA |= (1<<i);                                     //enable the LED if the condition is met
-                } else if (Analog_result < (STEPSIZE * (i+1) - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
+                } else if (analog_result < (STEPSIZE * (i+1) - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
                     PORTA &= ~(1<<i);                                    //disable the LED if the condition is met
                 }
             }
