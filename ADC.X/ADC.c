@@ -27,10 +27,20 @@ void main()
     
     TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
     TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
+    TRISEbits.TRISE2    = 1;                        // Define pin 10 as input (potentiometer) */
     
     ANSELHbits.ANS11    = 0;                        /* Define pin 37 as a digital input */                             
     ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
     ANSEL               = 0x80;                     // define low anaog pins as digital, these corrospond to digital pins RA0-RA3, RA5, RE0 and RE1, set RE2 as analog
+    
+    ADCON0bits.ADCS   = 0b00;                       // Set the speed of the ADC to FOSC/2
+    ADCON0bits.CHS    = 7;                          // Select chanel AN7, this is connected to RE2
+    ADCON0bits.GO     = 0;                          // Set the GO (status) bit to 0
+    ADCON0bits.ADON   = 1;                          // Enable the ADC
+
+    ADCON1bits.ADFM   = 1;                          // Right justify the output
+    ADCON1bits.VCFG0  = 0;                          // connect Vref+ to Vss
+    ADCON1bits.VCFG1  = 0;                          // connect Vref- to Vdd
     
     while (1)
     {
