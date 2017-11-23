@@ -20,6 +20,17 @@
 
 void main()
 {
+    OSCCON = 0b00110001;                            //500KHz clock speed
+    
+    TRISA               = 0;                        /* Define all RA pins as an output */
+    PORTA               = ~1;                       /* Turn on Input number 1 */
+    
+    TRISBbits.TRISB4    = 1;                        /* Define pin 37 as input (rotary A) */
+    TRISBbits.TRISB5    = 1;                        /* Define pin 38 as input (rotary B) */
+    
+    ANSELHbits.ANS11    = 0;                        /* Define pin 37 as a digital input */                             
+    ANSELHbits.ANS13    = 0;                        /* Define pin 38 as a digital input */
+    ANSEL               = 0x80;                     // define low anaog pins as digital, these corrospond to digital pins RA0-RA3, RA5, RE0 and RE1, set RE2 as analog
     
     while (1)
     {
