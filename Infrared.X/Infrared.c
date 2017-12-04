@@ -39,7 +39,18 @@ void main(void)
     INTCON                  = 0;            /* Disable any kind of interrupt */
     INTCONbits.RBIE         = 1;            /* Enable interrupt-on-change on PORTB register */
     INTCONbits.PEIE         = 1;            /* Enable interrupts from the outside (Maybe for IOC?) */
-    /* NOTE: At this point the global interrupt is not enabled yet */
+                                            /* NOTE: At this point the global interrupt is not enabled yet */
+    
+    T1CON                   = 0;            /* Timer1 is on (not dependent of a gate)    
+                                             * Use a 1:1 prescaler
+                                             * Do not use a Low-Power oscillator
+                                             * Use the internal oscillator / 4 (instruction time)
+                                             * Timer1 is off */
+                                            /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
+                                             * Here the Timer1 module will be turned on */ 
+    
+    PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
+    PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
     
     while(1)    
     {
@@ -56,9 +67,16 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     {
         if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
         {
-            
+            TMR1 = 63436;                   /* See footnote 3 and footnote 4 */
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
+    }
+    
+    if(PIR1bits.TMR1IF)
+    {
+        T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
+        /* We should check the RB0 pin state here and write a bit to the structure */
+        PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
     }
 }
 
@@ -70,5 +88,19 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
  *      Our clock speed is 4 MHz (4 000 000 Hz). This means that we execute (4 000 000 / 4) 1 000 000 instructions per second       *
  *      1 instruction takes (1 / 1 000 000) 0,000001 second per instruction. This is equal to 0,001 microseconds                    *
  *                                                                                                                                  *
+ *  Footnote 2                                                                                                                      *
+ *      When a 0 is received pin 33 is HIGH for 0,2 milliseconds                                                                    *
+ *      When a 1 is received pin 33 is HIGH for 0,6 milliseconds                                                                    *
+ *      Let's start a timer module and generate an interrupt after 0,2 milliseconds. If the pin is still high we received a 1.      *
  *                                                                                                                                  *
+ *  Footnote 3                                                                                                                      *
+ *      Every 0,001 microsecond the Timer1 module adds 1. Our goal is give an interrupt after 2 milliseconds                        *
+ *      2 = 0,001 * x     (x is 2 000)                                                                                              *
+ *      To have 100% assurance let's generate an interrupt after 2100 milliseconds                                                  *
+ *                                                                                                                                  *
+ *  Footnote 4                                                                                                                      *
+ *      Timer1 module contains a 16 bit resolution (65 536)                                                                         *
+ *      65 536 - 2100 = 63 436 (this should be the starting value)                                                                  *
+ *      (2 100 * 0,001) = 2,1 milliseconds                                                                                          *
+ *                                                                                                                                  *                                                                 
  ************************************************************************************************************************************/
