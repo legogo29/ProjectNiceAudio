@@ -31,8 +31,12 @@ typedef union
     unsigned array[12];                 /* Used to loop through all struct members */ 
 }IRbits;
 
-#define VOLUME_UP   (0b101100100000)
-#define VOLUME_DOWN (0b101100010000)
+#define VOLUME_UP   (0b101100100000)    /* See Note VOLUME_UP                       */
+#define VOLUME_DOWN (0b101100010000)    /* See Note VOLUME_Down                     */
+#define INPUT1      (0b101010010000)    /* See Note INPUT1                          */
+#define INPUT2      (0b101100001000)    /* See Note INPUT2                          */
+#define INPUT3      (0b101010100000)    /* See Note INPUT3                          */
+#define INPUT4      (0b101010001000)    /* See Note INPUT4                          */
 
 /******************************************************************************************************
         Notes about raw button codes that the uC receives 
@@ -54,5 +58,21 @@ The we get the 6 last bits.
     Code: 101 100 010000
     The volume- button is connected to key number 2.
     So this is a Continue button so H needs to be up. Key number 2 is connected to the row of D2
+        Notes INPUT1
+    Code: 101 010 010000
+    The INPUT1 button is connected to key number 8.
+    So this is a Single-Shot button, connected on S1 so this one is up. Key number 8 is connected to the row of D2
+        Notes INPUT2
+    Code: 101 100 001000
+    The INPUT2 button is connected to key number 3.
+    So this is a Continue button so H needs to be up. Key number 3 is connected to the row of D3
+        Notes INPUT3
+    Code: 101 010 100000
+    The INPUT3 button is connected to key number 7.
+    So this is a Single-Shot button, connected on S1 so this one is up. Key number 7 is connected to the row of D1
+        Notes INPUT4
+    Code: 101 010 001000
+    The INPUT1 button is connected to key number 9.
+    So this is a Single-Shot button, connected on S1 so this one is up. Key number 9 is connected to the row of D3
 *******************************************************************************************************/
 #endif
