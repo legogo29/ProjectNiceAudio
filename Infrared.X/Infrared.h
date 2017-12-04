@@ -38,7 +38,7 @@ typedef union
 #define INPUT3      (0b101010100000)    /* See Note INPUT3                          */
 #define INPUT4      (0b101010001000)    /* See Note INPUT4                          */
 
-/******************************************************************************************************
+/****************************************************************************************************************************
         Notes about raw button codes that the uC receives 
 The code that the uC receives is 12 bits long.
 The first 3 bits(C1, C2 AND C3) stand firm programed. 
@@ -74,5 +74,5 @@ The we get the 6 last bits.
     Code: 101 010 001000
     The INPUT1 button is connected to key number 9.
     So this is a Single-Shot button, connected on S1 so this one is up. Key number 9 is connected to the row of D3
-*******************************************************************************************************/
+****************************************************************************************************************************/
 #endif
