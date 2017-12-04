@@ -87,7 +87,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
         /* We should check the RB0 pin state here and write a bit to the structure */
-        if(PORTbits.RB0 = 1)                /* Or is this PORTBbits.... ? */
+        if(PORTBbits.RB0 == 1)
         {
             /* save this piece to SomeRegister as 1 */
             /* First shift register one space left. Then put the 1 at the end of it. */
@@ -97,6 +97,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
             /* save this piece to the datastring as 0 */
             /* First shift register one space left. Then put the 0 at the end of it. */
         }
+        /* Do we need to count how many ( total amount of transmitted bytes are send ) and then give a flag to use in the main program? */
         
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
     }
