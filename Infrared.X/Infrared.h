@@ -4,11 +4,11 @@
 
 typedef union 
 {
-    struct                              /* Anonymous structure with individual bits */
+    struct                              /* Anonymous structure with individual bits     */
     {
-        unsigned C1     : 1;            /* This one is pre set as 1                 */
-        unsigned C2     : 1;            /* This one is pre set as 0                 */
-        unsigned C3     : 1;            /* This one is pre set as 1                 */
+        unsigned C1     : 1;
+        unsigned C2     : 1;
+        unsigned C3     : 1;
         unsigned H      : 1;
         unsigned S1     : 1;
         unsigned S2     : 1;
@@ -20,15 +20,15 @@ typedef union
         unsigned D6     : 1;
     };
     
-    struct                              /* Anonymous structure with compacted bits */
+    struct                              /* Anonymous structure with compacted bits      */
     {
-        unsigned C      : 3;
-        unsigned H      : 1;
-        unsigned S      : 2;
-        unsigned D      : 6;
+        unsigned C      : 3;            /* C stands for Combination Buttons             */
+        unsigned H      : 1;            /* H stands for Continues Button                */
+        unsigned S      : 2;            /* S stands for Single Shot Button.             */
+        unsigned D      : 6;            /* D stands for input Data.                     */
     };
     
-    unsigned array[12];                 /* Used to loop through all struct members */ 
+    unsigned array[12];                 /* Used to loop through all struct members      */ 
 }IRbits;
 
 /****************************************************************************************************************************
