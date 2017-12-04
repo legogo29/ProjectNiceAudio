@@ -48,8 +48,11 @@ The we get the 6 last bits.
     
         Notes VOLUME_UP
     Code: 101 100 100000
-    The volume button is connected to key number 1. 
+    The volume+ button is connected to key number 1. 
     So this is a Continue button so H needs to be up. Key number 1 is connected to the row of D1. 
         Notes VOLUME_DOWN
+    Code: 101 100 010000
+    The volume- button is connected to key number 2.
+    So this is a Continue button so H needs to be up. Key number 2 is connected to the row of D2
 *******************************************************************************************************/
 #endif
