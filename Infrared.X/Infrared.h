@@ -30,4 +30,6 @@ typedef union
     unsigned array[12];                 /* Used to loop through all struct members */ 
 }IRbits;
 
+
+
 #endif
