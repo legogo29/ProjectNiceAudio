@@ -54,7 +54,18 @@ void main(void)
     
     while(1)    
     {
-                                            
+        /* Datastring check if it match Volume up */
+        if(SomeRegister = ......)
+        {
+            /* Then write to port 15 or 16 (one of those will put the volume up) */
+        }
+        else { /* Put port 15 / 16 down */ }
+        /* Datastring check if it match Volume down */
+        if(SomeRegister = ......)
+        {
+            /* Then write to port 15 or 16 (one of those will put the volume down) */
+        }
+        else { /* Put port 15 / 16 down */ }
     }
     
     return;                                 /* We will never reach this exit point */
@@ -76,6 +87,17 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
         /* We should check the RB0 pin state here and write a bit to the structure */
+        if(PORTbits.RB0 = 1)                /* Or is this PORTBbits.... ? */
+        {
+            /* save this piece to SomeRegister as 1 */
+            /* First shift register one space left. Then put the 1 at the end of it. */
+        }
+        else
+        {
+            /* save this piece to the datastring as 0 */
+            /* First shift register one space left. Then put the 0 at the end of it. */
+        }
+        
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
     }
 }
