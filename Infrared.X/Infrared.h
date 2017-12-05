@@ -3,6 +3,7 @@
 
 int index;                              /* Used to identify structure members in the array */
 
+extern volatile unsigned short IR @0x020;
 typedef union 
 {
     struct                              /* Anonymous structure with individual bits     */
