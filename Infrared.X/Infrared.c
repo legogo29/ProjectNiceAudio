@@ -52,20 +52,13 @@ void main(void)
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
     
+    index = 0;                              /* Start the index of the array (IRbits) at position 0 */
     while(1)    
     {
-        /* Datastring check if it match Volume up */
-        if(SomeRegister = ......)
-        {
-            /* Then write to port 15 or 16 (one of those will put the volume up) */
-        }
-        else { /* Put port 15 / 16 down */ }
-        /* Datastring check if it match Volume down */
-        if(SomeRegister = ......)
-        {
-            /* Then write to port 15 or 16 (one of those will put the volume down) */
-        }
-        else { /* Put port 15 / 16 down */ }
+        PORTAbits.RA0 = IRbits.D1;
+        PORTAbits.RA1 = IRbits.D2;
+        PORTAbits.RA2 = IRbits.D3;
+        PORTAbits.RA3 = IRbits.D4;
     }
     
     return;                                 /* We will never reach this exit point */
@@ -79,6 +72,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
         if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
         {
             TMR1 = 63436;                   /* See footnote 3 and footnote 4 */
+            T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
     }
@@ -87,18 +81,17 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
         /* We should check the RB0 pin state here and write a bit to the structure */
-        if(PORTBbits.RB0 == 1)
+        if(PORTBbits.RB0)
         {
-            /* save this piece to SomeRegister as 1 */
-            /* First shift register one space left. Then put the 1 at the end of it. */
+            IRbits.array[index] = 1;
         }
         else
         {
-            /* save this piece to the datastring as 0 */
-            /* First shift register one space left. Then put the 0 at the end of it. */
+            IRbits.array[index] = 0;
         }
-        /* Do we need to count how many ( total amount of transmitted bytes are send ) and then give a flag to use in the main program? */
         
+        index += 1;                         /* Increment the index by 1 (next array position */
+        if(index == 12) index = 0;          /* The transmission is complete. Let's point to the begin of the array */
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
     }
 }
