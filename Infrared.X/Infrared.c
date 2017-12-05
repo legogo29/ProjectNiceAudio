@@ -31,7 +31,7 @@ void main(void)
     PORTA                   = 0;            /* Turn off all LEDs */
     
     TRISC                   = 0;            /* Configure all C-pins as an output */
--   PORTC                   = 0;            /* Turn off motor */
+    PORTC                   = 0;            /* Turn off motor */
 
     TRISBbits.TRISB0        = 1;            /* Identify pin 33 (RB0) as an input */
     ANSELHbits.ANS8         = 0;            /* Set pin 33 (RB0) to a digital input */
@@ -66,18 +66,18 @@ void main(void)
         if(IR == VOLUME_UP)
          {
             /* Then write to port 15 or 16 (one of those will put the volume up) */
-            PORTCbits.PC0 = 1;
+            PORTCbits.RC0 = 1;
          }
          else if(IR == VOLUME_DOWN)
          {
              /* Then write to port 15 or 16 (one of those will put the volume down) */
-             PORTCbits.PC1 = 1;
+             PORTCbits.RC1 = 1;
          }
          else 
          { 
              /* Put port 15 / 16 down */ 
-             PORTCbits.PC0 = 0;
-             PORTCbits.PC1 = 0;
+             PORTCbits.RC0 = 0;
+             PORTCbits.RC1 = 0;
          }
     }
     
