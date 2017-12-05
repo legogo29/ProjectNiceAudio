@@ -66,17 +66,19 @@ void main(void)
         if(IR == VOLUME_UP)
          {
             /* Then write to port 15 or 16 (one of those will put the volume up) */
-            PORTCbits.RC0 = 1;
+            PORTCbits.RC1 = 0;
+            PORTCbits.RC0 = 1; //links
          }
          else if(IR == VOLUME_DOWN)
          {
              /* Then write to port 15 or 16 (one of those will put the volume down) */
-             PORTCbits.RC1 = 1;
+             PORTCbits.RC0 = 0;
+             PORTCbits.RC1 = 1; //rechts
          }
          else 
          { 
              /* Put port 15 / 16 down */ 
-             PORTCbits.RC0 = 0;
+             PORTCbits.RC0 = 0; //stil
              PORTCbits.RC1 = 0;
          }
     }
