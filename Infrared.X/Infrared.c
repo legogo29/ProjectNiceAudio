@@ -30,6 +30,9 @@ void main(void)
     TRISA                   = 0;            /* Configure all A-pins as an output */
     PORTA                   = 0;            /* Turn off all LEDs */
     
+    TRISC                   = 0;            /* Configure all C-pins as an output */
+-   PORTC                   = 0;            /* Turn off motor */
+
     TRISBbits.TRISB0        = 1;            /* Identify pin 33 (RB0) as an input */
     ANSELHbits.ANS8         = 0;            /* Set pin 33 (RB0) to a digital input */
     
