@@ -30,9 +30,6 @@ void main(void)
     TRISA                   = 0;            /* Configure all A-pins as an output */
     PORTA                   = 0;            /* Turn off all LEDs */
     
-    TRISC                   = 0;            /* Configure all C-pins as an output */
-    PORTC                   = 0;            /* Turn off motor */
-    
     TRISBbits.TRISB0        = 1;            /* Identify pin 33 (RB0) as an input */
     ANSELHbits.ANS8         = 0;            /* Set pin 33 (RB0) to a digital input */
     
@@ -62,6 +59,23 @@ void main(void)
         PORTAbits.RA1 = IRbits.D2;
         PORTAbits.RA2 = IRbits.D3;
         PORTAbits.RA3 = IRbits.D4;
+        /* Datastring check if it match Volume up */    
+        if(IR == VOLUME_UP)
+         {
+            /* Then write to port 15 or 16 (one of those will put the volume up) */
+            PORTCbits.PC0 = 1;
+         }
+         else if(IR == VOLUME_DOWN)
+         {
+             /* Then write to port 15 or 16 (one of those will put the volume down) */
+             PORTCbits.PC1 = 1;
+         }
+         else 
+         { 
+             /* Put port 15 / 16 down */ 
+             PORTCbits.PC0 = 0;
+             PORTCbits.PC1 = 0;
+         }
     }
     
     return;                                 /* We will never reach this exit point */
