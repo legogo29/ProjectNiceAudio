@@ -30,8 +30,8 @@ typedef union
     };
     
     unsigned array[12];                 /* Used to loop through all struct members      */ 
-}IRbits;
-
+}IRbits_t;
+extern volatile IRbits_t IRbits @0x020;
 
 #define VOLUME_UP   (0b101100100000)    /* key number 1, H  is up and D1 */ 
 #define VOLUME_DOWN (0b101100010000)    /* key number 2, H  is up and D2 */
