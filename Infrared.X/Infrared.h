@@ -41,4 +41,7 @@ extern volatile IRbits_t IRbits @0x020;
 #define INPUT3      (0b101010100000)    /* key number 7, S1 is up and D1 */
 #define INPUT4      (0b101010001000)    /* key number 9, S1 is up and D3 */  
 
+/* naar rechts draaien is volume_up. dat is RC0 */
+/* naar links draaien is volume_down. dat is RC1 */
+
 #endif
