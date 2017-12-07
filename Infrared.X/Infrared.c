@@ -34,7 +34,7 @@ void main(void)
     PORTC                   = 0;            /* Turn off motor */
 
     TRISBbits.TRISB0        = 1;            /* Identify pin 33 (RB0) as an input */
-    ANSELHbits.ANS12         = 0;            /* Set pin 33 (RB0) to a digital input */
+    ANSELHbits.ANS12        = 0;            /* Set pin 33 (RB0) to a digital input */
     
     IOCB                    = 0;            /* Disable interrupt-on-change on all B-pins */
     IOCBbits.IOCB0          = 1;            /* Enable interrupt-on-change for pin 33 (RB0) */
