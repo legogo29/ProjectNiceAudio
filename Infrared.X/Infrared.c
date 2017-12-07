@@ -68,25 +68,25 @@ void main(void)
         //PORTAbits.RA3 = IRbits.D4;
         /* Datastring check if it match Volume up */    
         if(IR == VOLUME_UP)
-         {
-            /* Then write to port 15 or 16 (one of those will put the volume up) */
+        {
+            /* Then write to port 16 to turn the motor to make the volume higher */
+            PORTCbits.RC0 = 0;
+            PORTCbits.RC1 = 1; //rechts
+        }
+        else if(IR == VOLUME_DOWN)
+        {
+            /* Then write to port 15 to turn the motor to make the volume lower */
             PORTCbits.RC1 = 0;
             PORTCbits.RC0 = 1; //links
-         }
-         else if(IR == VOLUME_DOWN)
-         {
-             /* Then write to port 15 or 16 (one of those will put the volume down) */
-             PORTCbits.RC0 = 0;
-             PORTCbits.RC1 = 1; //rechts
-         }
-         else 
-         { 
-            /* Put port 15 / 16 down */ 
-             PORTCbits.RC0 = 0; //stil
-             PORTCbits.RC1 = 0;
-         }
+        }
+        else 
+        { 
+            /* Put port 15 and 16 down */ 
+            PORTCbits.RC0 = 0;
+            PORTCbits.RC1 = 0;
+        }
     }
-    
+        
     return;                                 /* We will never reach this exit point */
 }
 
