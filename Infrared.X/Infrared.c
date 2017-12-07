@@ -34,12 +34,14 @@ void main(void)
     PORTC                   = 0;            /* Turn off motor */
 
     TRISBbits.TRISB0        = 1;            /* Identify pin 33 (RB0) as an input */
-    ANSELHbits.ANS8         = 0;            /* Set pin 33 (RB0) to a digital input */
+    ANSELHbits.ANS12         = 0;            /* Set pin 33 (RB0) to a digital input */
     
     IOCB                    = 0;            /* Disable interrupt-on-change on all B-pins */
     IOCBbits.IOCB0          = 1;            /* Enable interrupt-on-change for pin 33 (RB0) */
     
     INTCON                  = 0;            /* Disable any kind of interrupt */
+    //INTCONbits.INTE = 1;                    // enable interrupt on RB0;
+  
     INTCONbits.RBIE         = 1;            /* Enable interrupt-on-change on PORTB register */
     INTCONbits.PEIE         = 1;            /* Enable interrupts from the outside (Maybe for IOC?) */
                                             /* NOTE: At this point the global interrupt is not enabled yet */
@@ -55,13 +57,15 @@ void main(void)
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
     
+    INTCONbits.GIE  = 1;
+    
     index = 0;                              /* Start the index of the array (IRbits) at position 0 */
     while(1)    
     {
         PORTAbits.RA0 = IRbits.D1;
         PORTAbits.RA1 = IRbits.D2;
         PORTAbits.RA2 = IRbits.D3;
-        PORTAbits.RA3 = IRbits.D4;
+        //PORTAbits.RA3 = IRbits.D4;
         /* Datastring check if it match Volume up */    
         if(IR == VOLUME_UP)
          {
@@ -77,7 +81,7 @@ void main(void)
          }
          else 
          { 
-             /* Put port 15 / 16 down */ 
+            /* Put port 15 / 16 down */ 
              PORTCbits.RC0 = 0; //stil
              PORTCbits.RC1 = 0;
          }
@@ -89,11 +93,14 @@ void main(void)
 
 void interrupt isr()                        /* If any kind of interrupt occurs the program counter is set to this line */
 {
+    //most likely doesn't trigger because flag RBIF doesnt get set on interrupt
+    PORTAbits.RA3 = 1;
     if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
     {
+        PORTAbits.RA3 = 1;
         if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
         {
-            TMR1 = 63436;                   /* See footnote 3 and footnote 4 */
+            TMR1 = 0xff00;//63436;                   /* See footnote 3 and footnote 4 */
             T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
