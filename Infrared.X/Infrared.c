@@ -100,7 +100,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
         PORTAbits.RA3 = 1;
         if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
         {
-            TMR1 = 0xff00;//63436;                   /* See footnote 3 and footnote 4 */
+            TMR1 = 59536;                   /* See footnote 3 and footnote 4 */
             T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
@@ -131,21 +131,20 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
  *                                                                                                                                  *
  *  Footnote 1                                                                                                                      *
  *      Our clock speed is 4 MHz (4 000 000 Hz). This means that we execute (4 000 000 / 4) 1 000 000 instructions per second       *
- *      1 instruction takes (1 / 1 000 000) 0,000001 second per instruction. This is equal to 0,001 microseconds                    *
+ *      1 instruction takes (1 / 1 000 000) 0,000 001 second per instruction. This is equal to 0,001 milliseconds                    *
  *                                                                                                                                  *
  *  Footnote 2                                                                                                                      *
- *      When a 0 is received pin 33 is HIGH for 0,2 milliseconds                                                                    *
- *      When a 1 is received pin 33 is HIGH for 0,6 milliseconds                                                                    *
- *      Let's start a timer module and generate an interrupt after 0,2 milliseconds. If the pin is still high we received a 1.      *
+ *      When a 0 is received pin 33 is HIGH for 0,4 milliseconds                                                                    *
+ *      When a 1 is received pin 33 is HIGH for 1.2 milliseconds                                                                    *
+ *      Let's start a timer module and generate an interrupt after 0,6 milliseconds, so we have some slack. If the pin is still high we received a 1.      *
  *                                                                                                                                  *
  *  Footnote 3                                                                                                                      *
- *      Every 0,001 microsecond the Timer1 module adds 1. Our goal is give an interrupt after 2 milliseconds                        *
- *      2 = 0,001 * x     (x is 2 000)                                                                                              *
- *      To have 100% assurance let's generate an interrupt after 2100 milliseconds                                                  *
+ *      Every 0,001 microsecond the Timer1 module adds 1. Our goal is give an interrupt after 0.5 milliseconds                        *
+ *      0.6 = 0,001 * x     (x is 600)                                                                                                *
  *                                                                                                                                  *
  *  Footnote 4                                                                                                                      *
  *      Timer1 module contains a 16 bit resolution (65 536)                                                                         *
- *      65 536 - 2100 = 63 436 (this should be the starting value)                                                                  *
- *      (2 100 * 0,001) = 2,1 milliseconds                                                                                          *
+ *      65 536 - 600 = 59 536 (this should be the starting value)                                                                  *
+ *      (600 * 0,001) = 0.6 milliseconds                                                                                          *
  *                                                                                                                                  *                                                                 
  ************************************************************************************************************************************/
