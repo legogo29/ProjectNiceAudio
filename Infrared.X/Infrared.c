@@ -20,7 +20,6 @@
 #include "Infrared.h"
 
 
-
 void main(void) 
 {
     OSCCONbits.IRCF         = 0b110;        /* Set speed to 4 MHz */
@@ -40,8 +39,6 @@ void main(void)
     IOCBbits.IOCB0          = 1;            /* Enable interrupt-on-change for pin 33 (RB0) */
     
     INTCON                  = 0;            /* Disable any kind of interrupt */
-    //INTCONbits.INTE = 1;                    // enable interrupt on RB0;
-  
     INTCONbits.RBIE         = 1;            /* Enable interrupt-on-change on PORTB register */
     INTCONbits.PEIE         = 1;            /* Enable interrupts from the outside (Maybe for IOC?) */
                                             /* NOTE: At this point the global interrupt is not enabled yet */
@@ -57,7 +54,7 @@ void main(void)
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
     
-    INTCONbits.GIE  = 1;
+    INTCONbits.GIE          = 1;            /* All interrupts have been configured. We can enable the global interrupt */
     
     index = 0;                              /* Start the index of the array (IRbits) at position 0 */
     while(1)    
@@ -72,14 +69,12 @@ void main(void)
             /* Then write to port 16 to turn the motor to make the volume higher */
             PORTCbits.RC0 = 0;
             PORTCbits.RC1 = 1; //rechts
-        }
-        else if(IR == VOLUME_DOWN)
+        } else if(IR == VOLUME_DOWN)
         {
             /* Then write to port 15 to turn the motor to make the volume lower */
             PORTCbits.RC1 = 0;
             PORTCbits.RC0 = 1; //links
-        }
-        else 
+        } else 
         { 
             /* Put port 15 and 16 down */ 
             PORTCbits.RC0 = 0;
@@ -109,14 +104,13 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     if(PIR1bits.TMR1IF)
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
-        /* We should check the RB0 pin state here and write a bit to the structure */
-        if(PORTBbits.RB0)
+
+        if(PORTBbits.RB0)                   /* If the pin is still high after 0,6 milliseconds */
         {
-            IRbits.array[index] = 1;
-        }
-        else
+            IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
+        } else
         {
-            IRbits.array[index] = 0;
+            IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
         }
         
         index += 1;                         /* Increment the index by 1 (next array position */
@@ -131,20 +125,21 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
  *                                                                                                                                  *
  *  Footnote 1                                                                                                                      *
  *      Our clock speed is 4 MHz (4 000 000 Hz). This means that we execute (4 000 000 / 4) 1 000 000 instructions per second       *
- *      1 instruction takes (1 / 1 000 000) 0,000 001 second per instruction. This is equal to 0,001 milliseconds                    *
+ *      1 instruction takes (1 / 1 000 000) 0,000 001 second per instruction. This is equal to 0,001 milliseconds                   *
  *                                                                                                                                  *
  *  Footnote 2                                                                                                                      *
  *      When a 0 is received pin 33 is HIGH for 0,4 milliseconds                                                                    *
  *      When a 1 is received pin 33 is HIGH for 1.2 milliseconds                                                                    *
- *      Let's start a timer module and generate an interrupt after 0,6 milliseconds, so we have some slack. If the pin is still high we received a 1.      *
+ *      Let's start a timer module and generate an interrupt after 0,6 milliseconds, so we have some slack.                         *
+ *      If the pin is still high we received a 1.                                                                                   *
  *                                                                                                                                  *
  *  Footnote 3                                                                                                                      *
- *      Every 0,001 microsecond the Timer1 module adds 1. Our goal is give an interrupt after 0.5 milliseconds                        *
- *      0.6 = 0,001 * x     (x is 600)                                                                                                *
+ *      Every 0,001 microsecond the Timer1 module adds 1. Our goal is give an interrupt after 0.5 milliseconds                      *
+ *      0.6 = 0,001 * x     (x is 600)                                                                                              *
  *                                                                                                                                  *
  *  Footnote 4                                                                                                                      *
  *      Timer1 module contains a 16 bit resolution (65 536)                                                                         *
- *      65 536 - 600 = 59 536 (this should be the starting value)                                                                  *
- *      (600 * 0,001) = 0.6 milliseconds                                                                                          *
+ *      65 536 - 600 = 59 536 (this should be the starting value)                                                                   *
+ *      (600 * 0,001) = 0.6 milliseconds                                                                                            *
  *                                                                                                                                  *                                                                 
  ************************************************************************************************************************************/
