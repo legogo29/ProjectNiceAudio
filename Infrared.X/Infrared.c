@@ -90,6 +90,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
 {
     //most likely doesn't trigger because flag RBIF doesnt get set on interrupt
     PORTAbits.RA3 = 1;
+
     if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
     {
         //PORTAbits.RA3 = 1;
@@ -107,11 +108,11 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
 
         if(PORTBbits.RB0)                   /* If the pin is still high after 0,6 milliseconds */
         {
-            IR &= ~(1<<i);
+            IR |= (1<<index);
             //IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
         } else
         {
-            IR |= (1<<i);
+            IR &= ~(1<<index);
             //IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
         }
         
