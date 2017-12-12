@@ -107,10 +107,12 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
 
         if(PORTBbits.RB0)                   /* If the pin is still high after 0,6 milliseconds */
         {
-            IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
+            IR &= ~(1<<i);
+            //IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
         } else
         {
-            IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
+            IR |= (1<<i);
+            //IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
         }
         
         index += 1;                         /* Increment the index by 1 (next array position */
