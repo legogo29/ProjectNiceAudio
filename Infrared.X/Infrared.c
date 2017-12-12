@@ -95,7 +95,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
         PORTAbits.RA3 = 1;
         if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
         {
-            TMR1 = 59536;                   /* See footnote 3 and footnote 4 */
+            TMR1 = 64936;                   /* See footnote 3 and footnote 4 */
             T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
@@ -141,7 +141,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
  *                                                                                                                                  *
  *  Footnote 4                                                                                                                      *
  *      Timer1 module contains a 16 bit resolution (65 536)                                                                         *
- *      65 536 - 600 = 59 536 (this should be the starting value)                                                                   *
+ *      65 536 - 600 = 64936 (this should be the starting value)                                                                   *
  *      (600 * 0,001) = 0.6 milliseconds                                                                                            *
  *                                                                                                                                  *                                                                 
  ************************************************************************************************************************************/
