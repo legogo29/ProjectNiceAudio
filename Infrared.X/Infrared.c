@@ -89,7 +89,7 @@ void main(void)
 void interrupt isr()                        /* If any kind of interrupt occurs the program counter is set to this line */
 {
     //most likely doesn't trigger because flag RBIF doesnt get set on interrupt
-    //PORTAbits.RA3 = 1;
+    PORTAbits.RA3 = 1;
     if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
     {
         //PORTAbits.RA3 = 1;
