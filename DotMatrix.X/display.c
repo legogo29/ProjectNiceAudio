@@ -28,12 +28,13 @@ void main(void)
     TRISD                   = 0;                /* Identify all D-pins as output */
     PORTD                   = 0;                /* Set all D-pins to logical LOW */
     
+                                                /* NOTE: Since we do not have input from the display, this is unnecessary */
     SSPSTATbits.SMP         = 1;                /* Sample at the end of data output time */
     SSPSTATbits.CKE         = 1;                /* Data is transmitted on the rising edge */
     
     SSPCONbits.SSPM         = 0b0000;           /* SPI master mode
                                                  * Clock line will be Fosc / 4 (1 MHz) */ 
-    SSPCONbits.CKP          = 0;                /* Clock idle is a LOW signal */
+    SSPCONbits.CKP          = 0;                /* Clock idle is a LOW signal (See figure 13-2 in PIC16F887 datasheet) */
     SSPCONbits.SSPEN        = 1;                /* Enable pins (SCK, SDO, SDI)
                                                  * NOTE: not SS is also enabled (pin 7), but not used */
     
@@ -43,10 +44,12 @@ void main(void)
     display1.BL             = {&PORTC, 0x0006}; /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
     display1.RST            = {&PORTC, 0x0002}; /* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
     display1.CE             = {&PORTC, 0x0004}; /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
+    display1.RS             = {&PORTC, 0x0007}; /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
     display2.BL             = {&PORTD, 0x0006}; /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
     display2.RST            = {&PORTD, 0x0002}; /* PORTDbits.DS2 is connected to the reset pin of the dot matrix */
     display2.CE             = {&PORTD, 0x0004}; /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
+    display2.RS             = {&PORTD, 0x0007}; /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
     while(1)
     {
