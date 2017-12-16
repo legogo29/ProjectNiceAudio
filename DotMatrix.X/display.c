@@ -36,16 +36,19 @@ void main(void)
     SSPCONbits.CKP          = 0;                /* Clock idle is a LOW signal */
     SSPCONbits.SSPEN        = 1;                /* Enable pins (SCK, SDO, SDI)
                                                  * NOTE: not SS is also enabled (pin 7), but not used */
-    matric_29 display1;
-    matric_29 display2;
     
-    display1.bl             = PORTCbits.RC6;
+    struct matric_29 display1;                         
+    struct matric_29 display2;
+    
+    display1.bl             = {&PORTC, 0x0006};
+    /*
     display1.rst            = PORTCbits.RC2;
     display1.ce             = PORTCbits.RC4;
     
     display2.bl             = PORTDbits.RD6;
     display2.rst            = PORTDbits.RD2;
     display2.ce             = PORTDbits.RD4;
+    */
     
     while(1)
     {
