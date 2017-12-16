@@ -37,18 +37,16 @@ void main(void)
     SSPCONbits.SSPEN        = 1;                /* Enable pins (SCK, SDO, SDI)
                                                  * NOTE: not SS is also enabled (pin 7), but not used */
     
-    struct matric_29 display1;                         
-    struct matric_29 display2;
+    struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
+    struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
     
-    display1.bl             = {&PORTC, 0x0006};
-    /*
-    display1.rst            = PORTCbits.RC2;
-    display1.ce             = PORTCbits.RC4;
+    display1.BL             = {&PORTC, 0x0006}; /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
+    display1.RST            = {&PORTC, 0x0002}; /* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
+    display1.CE             = {&PORTC, 0x0004}; /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
     
-    display2.bl             = PORTDbits.RD6;
-    display2.rst            = PORTDbits.RD2;
-    display2.ce             = PORTDbits.RD4;
-    */
+    display2.BL             = {&PORTD, 0x0006}; /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    display2.RST            = {&PORTD, 0x0002}; /* PORTDbits.DS2 is connected to the reset pin of the dot matrix */
+    display2.CE             = {&PORTD, 0x0004}; /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     
     while(1)
     {
