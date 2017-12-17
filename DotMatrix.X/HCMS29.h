@@ -32,6 +32,8 @@ struct matric_29
 
 /* Function prototyping */
 
+char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask);
+
 /********************************************************************************************
  *                                                                                          *
  *  HCMS29ctl0(struct matric_29 device, config0 data)                                       *

@@ -41,28 +41,16 @@ void main(void)
     struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
     struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
     
-    display1.BL.address     = &PORTC;           /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
-    display1.BL.mask        = 0x0006;
-    display1.RST.address    = &PORTC;           /* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
-    display1.RST.mask       = 0x0002;
-    display1.CE.address     = &PORTC;           /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
-    display1.CE.mask        = 0x0004;
-    display1.RS.address     = &PORTC;           /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
-    display1.RS.mask        = 0x0007;
+    HCMS29struct_s(&display1.BL, &PORTC, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.RST, &PORTC, 0x02);/* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
+    HCMS29struct_s(&display1.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
+    HCMS29struct_s(&display1.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
 
-    display2.BL.address     = &PORTD;           /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
-    display2.BL.mask        = 0x0006;
-    display2.RST.address    = &PORTD;           /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
-    display2.RST.mask       = 0x0002;
-    display2.CE.address     = &PORTD;           /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
-    display2.CE.mask        = 0x0004;
-    display2.RS.address     = &PORTD;           /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
-    display2.RS.mask        = 0x0007;
-   
-    /*  TODO: Make a subroutine and pass by pointer a struct and values.
-     *  The code compiles now, but my eyes burn when looking at the code
-     *  Assigning by hand (line 44 and to 60) looks ugly and amateurish  */
-     
+    HCMS29struct_s(&display1.BL, &PORTD, 0x06); /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.RST, &PORTD, 0x02);/* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
+    HCMS29struct_s(&display1.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
+         
     
     while(1)
     {
