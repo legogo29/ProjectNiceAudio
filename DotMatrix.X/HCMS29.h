@@ -1,6 +1,26 @@
 #ifndef _HCMS29_H
 #define _HCMS29_H
-                   
+            
+enum
+{
+    PWM0 = 0b0000,
+    PWM1 = 0b0001,
+    PWM2 = 0b0010,
+    PWM3 = 0b0011,
+    PWM4 = 0b0100,
+    PWM5 = 0b0101,
+    PWM7 = 0b0110,
+    PWM9 = 0b0111,
+    PWM11= 0b1000,
+    PWM14= 0b1001,
+    PWM18= 0b1010,
+    PWM22= 0b1011,
+    PWM28= 0b1100,
+    PWM36= 0b1101,
+    PWM48= 0b1110,
+    PWM60= 0b1111
+};
+
 typedef struct
 {
     unsigned brightness : 4;                    /* PWM brightness control*/
@@ -39,6 +59,6 @@ char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int 
 
 void    HCMS29ctl0(struct matric_29 device, config0 data);
 
-void    HCMD29ctl1(struct matric_29 device, config1 data);
+void    HCMS29ctl1(struct matric_29 device, config1 data);
 
 #endif

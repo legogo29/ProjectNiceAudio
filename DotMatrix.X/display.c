@@ -41,17 +41,27 @@ void main(void)
     struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
     struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
     
-    HCMS29struct_s(&display1.BL, &PORTC, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.BL, &PORTA, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
     HCMS29struct_s(&display1.RST, &PORTC, 0x02);/* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
     HCMS29struct_s(&display1.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display1.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
 
-    HCMS29struct_s(&display2.BL, &PORTD, 0x06); /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display2.BL, &PORTA, 0x06); /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
     HCMS29struct_s(&display2.RST, &PORTD, 0x02);/* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
-         
     
+    /*
+    TRISA = 0;
+    PORTA = 0;
+    
+    config0 data;
+    data.brightness = PWM36;
+    data.current = 0b11;
+    data.sleep = 1;
+
+    HCMS29ctl0(display1, data);
+    */
     while(1)
     {
 
