@@ -29,30 +29,16 @@ struct matric_29
     struct sfr_member_t   RS;                   /* Register select pin  [0 is dot register] [1 is control register] */
 };
 
-
-/* Function prototyping */
-
+/*  Set a member of the struct matric_29 (which is always a struct sfr_member_t)
+ *  
+ *  @param reg:     A pointer to a struct sfr_member_t 
+ *  @param address: The address of the special function register
+ *  @param mask:    An offset to set an individual bit of the special function register */
 char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask);
 
-/********************************************************************************************
- *                                                                                          *
- *  HCMS29ctl0(struct matric_29 device, config0 data)                                       *
- *                                                                                          *
- *  Control the CONTROL WORD 0 register of the HCMS-29xx display.                           *
- *  This register contains options for PWM brightness, peak current and sleep mode.         *
- *                                                                                          *
- ********************************************************************************************/
+
 void    HCMS29ctl0(struct matric_29 device, config0 data);
 
-
-/********************************************************************************************
- *                                                                                          *
- *  HCMS29ctl1(struct matric_29 device, config1 data)                                       *
- *                                                                                          *
- *  Control the CONTROL WORD 1 register of the HCMS-29xx display.                           *
- *  This register contains options for data out pin and external oscillator prescaler       *
- *                                                                                          *
- ********************************************************************************************/
 void    HCMD29ctl1(struct matric_29 device, config1 data);
 
 #endif
