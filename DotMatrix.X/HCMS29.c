@@ -22,12 +22,11 @@ void    HCMS29send(struct matric_29 device, char c)
 {
     for(int i=0; i < 5; i++)
     {
-        if(i !=0)   /* Why initialise i to 0 and exclude 0? */
+        if(i !=0)   // exclude 0 incase SSPIF wasnt set before this function was called
         {
-            while(!PIR1bits.SSPIF)
-                /*moest hier wat?*/
+            while(!PIR1bits.SSPIF);
             PIR1bits.SSPIF = 0;
-            SSPBUF = CHARACTER_SET[5*c + i];
         }
+            SSPBUF = CHARACTER_SET[5*c + i];
     }
 }
