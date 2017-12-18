@@ -61,4 +61,7 @@ void    HCMS29ctl0(struct matric_29 device, config0 data);
 
 void    HCMS29ctl1(struct matric_29 device, config1 data);
 
+void    SendCharToDisplay(char c);
+
+}
 #endif
