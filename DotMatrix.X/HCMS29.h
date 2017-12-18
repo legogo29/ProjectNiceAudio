@@ -56,7 +56,6 @@ struct matric_29
  *  @param mask:    An offset to set an individual bit of the special function register */
 char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask);
 
-
 void    HCMS29ctl0(struct matric_29 device, config0 data);
 
 void    HCMS29ctl1(struct matric_29 device, config1 data);

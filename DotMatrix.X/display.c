@@ -51,7 +51,7 @@ void main(void)
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
-    /*
+    
     TRISA = 0;
     PORTA = 0;
     
@@ -61,7 +61,7 @@ void main(void)
     data.sleep = 1;
 
     HCMS29ctl0(display1, data);
-    */
+    
     while(1)
     {
 
