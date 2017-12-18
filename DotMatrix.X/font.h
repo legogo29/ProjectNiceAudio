@@ -3,7 +3,7 @@
 
 const char CHARACTER_SET[640] = {
     08, 1C, 3E, 7F, 00, //driehoek naar links
-    30, 45, 48, 40, 30, //onderste boven ?
+    30, 45, 48, 40, 30, //onderste boven ? (¿)
     45, 29, 11, 29, 45, // x bar
     7D, 09, 11, 21, 7D, // N bar
     7D, 09, 05, 05, 7D, // n bar
