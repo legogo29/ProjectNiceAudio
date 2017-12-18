@@ -70,6 +70,20 @@ void main(void)
 
 void interrupt isr()
 {
-    
-}
 
+
+
+}
+void SendCharToDisplay(char c)
+{
+    for(int i=0; i < 5; i++)
+    {
+        if(i !=0)
+        {
+            while(!PIR1bits.SSPIF)
+            /*moest hier wat?*/
+            PRI1bits.SSPIF = 0;
+            SPBUF = CHARACTER_SET[5*c + i];
+        }
+    }
+}
