@@ -16,3 +16,16 @@ void    HCMS29ctl1(struct matric_29 device, config1 data)
 {
     SSPBUF = (1 << 7) | (0 << 6) | (0 << 5) | (0 << 4) | (0 << 3) | (0 << 2) | (data.prescaler << 1) | (data.data_out);
 }
+void SendCharToDisplay(char c)
+{
+    for(int i=0; i < 5; i++)
+    {
+        if(i !=0)
+        {
+            while(!PIR1bits.SSPIF)
+                /*moest hier wat?*/
+            PRI1bits.SSPIF = 0;
+            SPBUF = CHARACTER_SET[5*c + i];
+        }
+    }
+}
