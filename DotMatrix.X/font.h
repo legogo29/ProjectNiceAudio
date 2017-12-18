@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef _FONT_H
+#define _FONT_H
 
 const char CHARACTER_SET[640] = {
     08, 1C, 3E, 7F, 00, //driehoek naar links
@@ -62,3 +62,5 @@ const char CHARACTER_SET[640] = {
     3C, 4A, 49, 49, 30, // 6
     
 };
+
+#endif  /* _FONT_H */
