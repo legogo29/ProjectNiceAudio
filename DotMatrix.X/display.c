@@ -81,7 +81,7 @@ void SendCharToDisplay(char c)
         if(i !=0)
         {
             while(!PIR1bits.SSPIF)
-            /*moest hier wat?*/
+                /*moest hier wat?*/
             PRI1bits.SSPIF = 0;
             SPBUF = CHARACTER_SET[5*c + i];
         }
