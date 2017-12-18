@@ -11,5 +11,7 @@ This repository contains the full software we developed to control a PCB which i
 
 
 The requirements of the client were:
-* The Rotary encoder must be read by the microcontroller in order to switch input port.
-* 
+* The rotary encoder must be read by the microcontroller in order to switch input port.
+* The potentiometer must be read by the microcontroller in order to set the volume.
+* The microcontroller should trigger when the infrared receiver generates pulses. A result is to set the volume remotely.
+* The microcontroller need to inform an user by writing relevant characters to the display.
