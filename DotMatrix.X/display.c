@@ -14,13 +14,16 @@
 #pragma config BOR4V = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 #pragma config WRT = OFF        // Flash Program Memory Self Write Enable bits (Write protection off)
 
-
 #include <xc.h>                             
 #include "HCMS29.h"                             /* Library for the HCMS-29xx dot matrix display */
-                                            
+
+#define _XTAL_FREQ  4000000
+
 void main(void)
 {
     OSCCONbits.IRCF         = 0b110;            /* Set the internal clock speed to 4 MHz */
+    OSCCONbits.OSTS         = 0;
+    OSCCONbits.SCS          = 0;
     
     TRISC                   = 0;                /* Identify all C-pins as output */
     PORTC                   = 0;                /* Set all C-pins to logical LOW */
@@ -47,30 +50,62 @@ void main(void)
     HCMS29struct_s(&display1.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
 
     HCMS29struct_s(&display2.BL, &PORTD, 0x06); /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
-    HCMS29struct_s(&display2.RST, &PORTD, 0x02);/* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display2.RST, &PORTD, 0x02);/* PORTDbits.DS2 is connected to the reset pin of the dot matrix */
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
-    
+    PORTDbits.RD6 = 0;
+    PORTDbits.RD2 = 1;
+    /*
     TRISA = 0;
     PORTA = 0;
     
     config0 data;
-    data.brightness = PWM36;
+    data.brightness = PWM60;
     data.current = 0b11;
-    data.sleep = 1;
+    data.sleep = 0;
 
     HCMS29ctl0(display1, data);
+    */
+    
+    config0 conf0;
+    conf0.brightness = PWM60;
+    conf0.current = 0b11;
+    conf0.sleep = 0b1;
+    
+    config1 conf1;
+    conf1.data_out = 0b0;
+    conf1.prescaler = 0b1;
+    
+    
+    HCMS29ctl0(display2, conf0);
+    __delay_ms(100);
+    HCMS29ctl1(display2, conf1);
+    __delay_ms(100);
+    /*
+    HCMS29send(display2, 'a');
+    */
+    
+    __delay_ms(100);
+    PORTDbits.RD7 = 0;
+    __delay_ms(100);
+    PORTDbits.RD4 = 0;
+    __delay_ms(100);
+    SSPBUF = 0b01111110;
+    PORTDbits.RD4 = 1;
+    __delay_ms(100);
+
+    
+    TRISA = 0;
+    PORTA = 0;
     
     while(1)
     {
-
+        PORTAbits.RA0 = 0;
+        __delay_ms(1000);
+        PORTAbits.RA0 = 1;
+        __delay_ms(1000);
     }
-}
-
-void interrupt isr()
-{
-
-
-
+    
+    return;
 }
