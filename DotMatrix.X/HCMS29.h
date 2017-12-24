@@ -62,5 +62,7 @@ void    HCMS29ctl1(struct matric_29 device, config1 data);
 
 void    HCMS29send(struct matric_29 device, char c);
 
+void    HCMS29wakeup(struct matric_29 device);
+
 
 #endif

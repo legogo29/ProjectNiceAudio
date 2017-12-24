@@ -44,7 +44,7 @@ void main(void)
     struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
     struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
     
-    HCMS29struct_s(&display1.BL, &PORTC, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.BL, &PORTD, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
     HCMS29struct_s(&display1.RST, &PORTC, 0x02);/* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
     HCMS29struct_s(&display1.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display1.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
@@ -54,57 +54,19 @@ void main(void)
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
-    PORTDbits.RD6 = 0;
-    PORTDbits.RD2 = 1;
-    /*
-    TRISA = 0;
-    PORTA = 0;
-    
-    config0 data;
-    data.brightness = PWM60;
-    data.current = 0b11;
-    data.sleep = 0;
-
-    HCMS29ctl0(display1, data);
-    */
-    
-    config0 conf0;
-    conf0.brightness = PWM60;
-    conf0.current = 0b11;
-    conf0.sleep = 0b1;
-    
-    config1 conf1;
-    conf1.data_out = 0b0;
-    conf1.prescaler = 0b1;
     
     
-    HCMS29ctl0(display2, conf0);
-    __delay_ms(100);
-    HCMS29ctl1(display2, conf1);
-    __delay_ms(100);
-    /*
-    HCMS29send(display2, 'a');
-    */
+    config0 con;
+    con.brightness = 0b1010;
+    con.current = 0b10;
+    con.sleep = 1;
     
-    __delay_ms(100);
-    PORTDbits.RD7 = 0;
-    __delay_ms(100);
-    PORTDbits.RD4 = 0;
-    __delay_ms(100);
-    SSPBUF = 0b01111110;
-    PORTDbits.RD4 = 1;
-    __delay_ms(100);
-
-    
-    TRISA = 0;
-    PORTA = 0;
+    HCMS29ctl0(display1, con);
+    HCMS29wakeup(display1);
     
     while(1)
     {
-        PORTAbits.RA0 = 0;
-        __delay_ms(1000);
-        PORTAbits.RA0 = 1;
-        __delay_ms(1000);
+        
     }
     
     return;
