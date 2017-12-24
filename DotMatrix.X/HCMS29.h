@@ -56,12 +56,31 @@ struct matric_29
  *  @param mask:    An offset to set an individual bit of the special function register */
 char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask);
 
+
+/*  Configure control register 0 (first the display will listen, then it will latch the data)
+ * 
+ *  @param  device: Copy of the structure members (so the correct pins will be used) 
+ *  @param  data:   The desired configuration (PWM brightness, peak pixel current and sleep mode) */
 void    HCMS29ctl0(struct matric_29 device, config0 data);
 
+
+/*  Configure control register 1 (first the display will listen, then it will latch the data)
+ *
+ *  @param device:  Copy of the structure members (so the correct pins will be used)
+ *  @param data:    The desired configuration (data output mode and external oscillator prescaler) */
 void    HCMS29ctl1(struct matric_29 device, config1 data);
 
+
+/*  Send data that will be shown on the display
+ * 
+ *  @param device:  Copy of the structure members (so the correct pins will be used)
+ *  @param c:       The character that needs to be shown (font.h is required) */
 void    HCMS29send(struct matric_29 device, char c);
 
+
+/*  Wake up the HCMS29xx so the programmer can have influence on the display output
+ * 
+ *  @param device:  Copy of the structure members (so the correct pins will be used) */
 void    HCMS29wakeup(struct matric_29 device);
 
 

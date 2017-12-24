@@ -25,10 +25,10 @@ void main(void)
     OSCCONbits.OSTS         = 0;
     OSCCONbits.SCS          = 0;
     
-    TRISC                   = 0;                /* Identify all C-pins as output */
+    TRISC                   = 0;                /* Identify all C-pins as output (used for display1) */
     PORTC                   = 0;                /* Set all C-pins to logical LOW */
     
-    TRISD                   = 0;                /* Identify all D-pins as output */
+    TRISD                   = 0;                /* Identify all D-pins as output (used for display2) */
     PORTD                   = 0;                /* Set all D-pins to logical LOW */
     
                                                 /* NOTE: Since we do not have input from the display, this is unnecessary */
@@ -44,7 +44,7 @@ void main(void)
     struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
     struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
     
-    HCMS29struct_s(&display1.BL, &PORTD, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.BL, &PORTC, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
     HCMS29struct_s(&display1.RST, &PORTC, 0x02);/* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
     HCMS29struct_s(&display1.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display1.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
@@ -55,14 +55,6 @@ void main(void)
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
     
-    
-    config0 con;
-    con.brightness = 0b1010;
-    con.current = 0b10;
-    con.sleep = 1;
-    
-    HCMS29ctl0(display1, con);
-    HCMS29wakeup(display1);
     
     while(1)
     {

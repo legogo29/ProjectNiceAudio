@@ -8,6 +8,8 @@ char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int 
     reg->address = address;
     reg->mask = mask;
 }
+
+
 void    HCMS29ctl0(struct matric_29 device, config0 data)
 {
     *device.RS.address |= (1 << device.RS.mask);    /* Set the register select pin to logic HIGH */
@@ -21,6 +23,7 @@ void    HCMS29ctl0(struct matric_29 device, config0 data)
     *device.CE.address |= (1 << device.CE.mask);    /* Set the chip enable to logic HIGH so de data will be latched in the control word */
     PIR1bits.SSPIF = 0;                             /* Clear the interrupt flag AFTER setting the CE pin (this has higher priority */
 }
+
 
 void    HCMS29ctl1(struct matric_29 device, config1 data)
 {
@@ -36,6 +39,8 @@ void    HCMS29ctl1(struct matric_29 device, config1 data)
     *device.CE.address |= (1 << device.CE.mask);    /* Set the chip enable to logic HIGH so de data will be latched in the control word */
     PIR1bits.SSPIF = 0;                             /* Clear the interrupt flag AFTER setting the CE pin (this has higher priority */
 }
+
+
 void    HCMS29send(struct matric_29 device, char c)
 {
     *device.RS.address &= ~(1 << device.RS.mask);
