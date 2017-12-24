@@ -84,4 +84,9 @@ void    HCMS29send(struct matric_29 device, char c);
 void    HCMS29wakeup(struct matric_29 device);
 
 
-#endif
+/*  Turn the display in sleep mode (control words & registers will be set to 0 which results in no output to the user)
+ *
+ *  @param device:  Copy of the structure members (so the correct pins will be used) */
+void    HCMS29sleep(struct matric_29 device);
+
+#endif  /* _HCMS29_H */

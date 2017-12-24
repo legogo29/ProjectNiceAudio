@@ -64,7 +64,7 @@ void    HCMS29wakeup(struct matric_29 device)
 {
     config0 config;
 
-    config.brightness = 0b1101;                     /* Set brightness to 60% */
+    config.brightness = PWM36;                      /* Set brightness to 60% */
     config.current = 0b00;                          /* Default at power-up */
     config.sleep = 0b1;                             /* Do not sleep */
     
@@ -81,4 +81,12 @@ void    HCMS29wakeup(struct matric_29 device)
     
     *device.CE.address |= (1 << device.CE.mask);    /* Set to logic high so data will be latched. */
     HCMS29ctl0(device, config);                     /* Export the sleep bit logic high to control register 0 */
+}
+
+
+void    HCMS29sleep(struct matric_29 device)
+{
+    *device.RST.address &= ~(1 << device.RST.mask); /* Turn off the RESET pin (it's active LOW so the display will sleep) *
+                                                     * The dot register is still there, but blanked (so the user will not see the output) 
+                                                     * The control register and control words are all 0s now */
 }
