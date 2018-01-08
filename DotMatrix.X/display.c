@@ -59,8 +59,18 @@ void main(void)
     data.brightness = PWM36;
     data.current = 0b11;
     data.sleep = 1;
+    
+    HCMS29send(display1, 0);
+    HCMS29send(display1, 1);
+    HCMS29send(display1, 2);
+    HCMS29send(display1, 3);
+    HCMS29send(display1, 4);
+    HCMS29send(display1, 5);
+    HCMS29send(display1, 6);
 
-    HCMS29ctl0(display1, data);
+    //HCMS29ctl0(display1, data);
+    
+    HCMS29send(display1, 0);
     
     while(1)
     {
