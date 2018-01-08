@@ -62,20 +62,21 @@ void main(void)
     HCMS29send(display1, 0x23);
     HCMS29send(display1, 4);
     HCMS29send(display1, 5);*/
-//    HCMS29send(display1, '|');
+    HCMS29send(display1, 0);
 
-    SSPBUF = 0b11001100;
+//    SSPBUF = 0b11001100;
     
-    __delay_ms(1);
+//    __delay_ms(1);
     
     //SSPBUF = 0b01111111;
     
     //char i = 0;
     while(1)
     {
-        SSPBUF = 0b00000001;
-        __delay_ms(1000);
-        SSPBUF = 0b10000000;
+//        SSPBUF = 0b10000000;
+//        SSPBUF = 0b00000001;
+//        __delay_ms(1000);
+//        SSPBUF = 0b00000000;
         __delay_ms(1000);
     }
     
