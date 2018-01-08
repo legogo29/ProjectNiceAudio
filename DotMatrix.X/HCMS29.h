@@ -1,6 +1,15 @@
 #ifndef _HCMS29_H
 #define _HCMS29_H
             
+const char TESTARRAY[5] = {
+    0b01100110,
+    0b01100110,
+    0b01010101,
+    0b01010101,
+    0b01111111
+//    0xff,0xff,0xff,0xff,0xff
+};
+
 enum
 {
     PWM0 = 0b0000,

@@ -53,7 +53,8 @@ void    HCMS29send(struct matric_29 device, char c)
             while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
             //PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
         }
-        SSPBUF = CHARACTER_SET[5*c + i];
+//        SSPBUF = TESTARRAY[i]; 
+        SSPBUF = CHARACTER_SET[(5*c) + i];
     }
     
     *device.CE.address |= (1 << device.CE.mask);

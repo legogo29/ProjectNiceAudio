@@ -54,19 +54,26 @@ void main(void)
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
-    HCMS29wakeup(display1);
+    //HCMS29wakeup(display1);
         
-    /*HCMS29send(display1, 0);
+    /*HCMS29send(display1, 0);/*
     HCMS29send(display1, 1);
     HCMS29send(display1, 2);
     HCMS29send(display1, 0x23);
     HCMS29send(display1, 4);
     HCMS29send(display1, 5);*/
-    HCMS29send(display1, 0x49);
+    HCMS29send(display1, '|');
     
+    __delay_ms(1);
+    
+    //SSPBUF = 0b01111111;
+    
+    //char i = 0;
     while(1)
     {
-        __delay_ms(1);
+        //SSPBUF = i;
+        __delay_ms(1000);
+        //i++;
     }
     
     return;
