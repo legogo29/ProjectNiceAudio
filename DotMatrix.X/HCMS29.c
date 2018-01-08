@@ -48,10 +48,10 @@ void    HCMS29send(struct matric_29 device, char c)
     
     for(int i=0; i < 5; i++)
     {               
-        if(!i)                                      /* Exclude 0 in case SSPIF was no set before the function call */
+        if(i != 0)                                      /* Exclude 0 in case SSPIF was no set before the function call */
         {
             while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
-            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
+            //PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
         }
         SSPBUF = CHARACTER_SET[5*c + i];
     }
