@@ -14,18 +14,21 @@
 #pragma config BOR4V = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 #pragma config WRT = OFF        // Flash Program Memory Self Write Enable bits (Write protection off)
 
-
 #include <xc.h>                             
 #include "HCMS29.h"                             /* Library for the HCMS-29xx dot matrix display */
-                                            
+
+#define _XTAL_FREQ  4000000
+
 void main(void)
 {
     OSCCONbits.IRCF         = 0b110;            /* Set the internal clock speed to 4 MHz */
+    OSCCONbits.OSTS         = 0;
+    OSCCONbits.SCS          = 0;
     
-    TRISC                   = 0;                /* Identify all C-pins as output */
+    TRISC                   = 0;                /* Identify all C-pins as output (used for display1) */
     PORTC                   = 0;                /* Set all C-pins to logical LOW */
     
-    TRISD                   = 0;                /* Identify all D-pins as output */
+    TRISD                   = 0;                /* Identify all D-pins as output (used for display2) */
     PORTD                   = 0;                /* Set all D-pins to logical LOW */
     
                                                 /* NOTE: Since we do not have input from the display, this is unnecessary */
@@ -47,7 +50,7 @@ void main(void)
     HCMS29struct_s(&display1.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
 
     HCMS29struct_s(&display2.BL, &PORTD, 0x06); /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
-    HCMS29struct_s(&display2.RST, &PORTD, 0x02);/* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display2.RST, &PORTD, 0x02);/* PORTDbits.DS2 is connected to the reset pin of the dot matrix */
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
@@ -74,13 +77,8 @@ void main(void)
     
     while(1)
     {
-
+        
     }
-}
-
-void interrupt isr()
-{
-
-
-
+    
+    return;
 }

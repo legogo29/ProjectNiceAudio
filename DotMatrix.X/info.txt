@@ -1,0 +1,21 @@
+Imagine we have the next configuration
+
+config0 con;
+con.brightness	= 0b1010;
+con.current	= 0b10;
+con.sleep	= 1;
+
+Since configuration0 it's MSB (bit 7) is 0 we see this in the diagram under here.
+If we print the next configuration on 8 LEDs, the result is as next
+
+_________________________________________________________________
+|	|	|	|	|	|	|	|	|
+| Bit 7 | Bit 6 | Bit 5 | Bit 4 | Bit 3 | Bit 2 | Bit 1 | Bit 0 |
+|_______|_______|_______|_______|_______|_______|_______|_______|
+|	|	|	|	|	|	|	|	|
+|   0   |   1   |   1   |   0   |   1   |   0   |   1   |   0   |
+|_______|_______|_______|_______|_______|_______|_______|_______|
+
+Important:
+* Data is entered on the rising edge
+*  

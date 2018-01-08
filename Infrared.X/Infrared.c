@@ -23,7 +23,7 @@
 void main(void) 
 {
     OSCCONbits.IRCF         = 0b110;        /* Set speed to 4 MHz */
-    OSCCONbits.OSTS         = 0;            /* An internal oscillator is used */
+    OSCCONbits.OSTS         = 0;            /* An internal oscillat or is used */
     OSCCONbits.SCS          = 0;            /* System clock is determined by the FOSC config bit */
     
     TRISA                   = 0;            /* Configure all A-pins as an output */
@@ -62,9 +62,10 @@ void main(void)
         PORTAbits.RA0 = IRbits.D1;
         PORTAbits.RA1 = IRbits.D2;
         PORTAbits.RA2 = IRbits.D3;
-        //PORTAbits.RA3 = IRbits.D4;
+        PORTAbits.RA3 = IRbits.D4;
         /* Datastring check if it match Volume up */    
-        if(IR == VOLUME_UP)
+        //if(IR == VOLUME_UP)
+        if(!IRbits.D3)
         {
             /* Then write to port 16 to turn the motor to make the volume higher */
             PORTCbits.RC0 = 0;
@@ -101,7 +102,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
     }
-    
+                                            
     if(PIR1bits.TMR1IF)
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
