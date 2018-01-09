@@ -14,18 +14,119 @@
 #pragma config BOR4V = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 #pragma config WRT = OFF        // Flash Program Memory Self Write Enable bits (Write protection off)
 
-#include <xc.h>                             
+#include <xc.h>      
+#include "../DotMatrix.X/HCMS29.h"
 
 #define _XTAL_FREQ  4000000
+
+// For ADC
+#define NUMBER_OF_LEDS 4                            //number of LEDs this program will control
+#define INPUTBITS 1024                              //the size of the input value
+#define HYSTERESIS ((int) (INPUTBITS * 0.01))       //the size of the offset for hysteresis, this is 1% of the input range
+#define STEPSIZE (INPUTBITS / (NUMBER_OF_LEDS+1))   //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
+
 
 void picinit(void);
 
 void main(void)
 {
+    picinit();
     
+    /*
+     * Setup Displays
+     */
+    struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
+    struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
+        
+    HCMS29struct_s(&display1.BL, &PORTD, 0x06); /* PORTDbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display1.RST, &PORTD, 0x02);/* PORTDbits.DS2 is connected to the reset pin of the dot matrix */
+    HCMS29struct_s(&display1.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
+    HCMS29struct_s(&display1.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
+    
+    HCMS29struct_s(&display2.BL, &PORTC, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
+    HCMS29struct_s(&display2.RST, &PORTC, 0x02);/* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
+    HCMS29struct_s(&display2.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
+    HCMS29struct_s(&display2.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
+    
+    PORTDbits.RD6 = 0;
+    
+    config0 conf0;
+    conf0.brightness = PWM18;
+    conf0.current = 0b11;
+    conf0.sleep = 0b1;
+    
+    config1 conf1;
+    conf1.data_out = 0b0;
+    conf1.prescaler = 0b1;
+    
+    HCMS29wakeup(display1);
+
+    HCMS29ctl0(display1, conf0);
+    __delay_ms(100);
+    HCMS29ctl1(display1, conf1);
+    __delay_ms(100);
+    
+    while (1)
+    {
+        /*
+         * ADC
+         */
+        if (!GO)
+        {
+            GO = 1;
+            short analog_result = ((short) ADRESH << 8) | ADRESL;
+            for (char i = 0; i < 8 /* NUMBER_OF_LEDS*/; i++) {                 //iterate through the LEDS
+                if (analog_result > (STEPSIZE * (i+1) + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
+                    PORTA &= ~(1<<i);                                    //disable the LED if the condition is met
+                } else if (analog_result < (STEPSIZE * (i+1) - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
+                    PORTA |= (1<<i);                                     //enable the LED if the condition is met
+                }
+            }
+        }
+    }
 }
 
-void picinit(void) {
+void interrupt ISR()
+{
+    /*
+     * Rotary Encoder
+     */
+    if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
+    {
+        int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+        
+        switch(value)                               /* Determine the direction of the rotary encoer */
+        {
+            case 1:                                 /* The rotary encoder went clockwise */
+                if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
+                {
+                    PORTAbits.RA3 = 1;              // manualy set the new condition
+                    PORTAbits.RA0 = 0;
+                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                }
+                PORTA = PORTA << 1;
+                PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                break;
+            case 0:                                 /* The rotary encoder went contra clockwise */
+                
+                if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
+                    PORTAbits.RA0 = 1;              // manualy set the new condition
+                    PORTAbits.RA3 = 0;
+                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                }
+                PORTA = PORTA >> 1;
+                PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                break;
+        }
+        INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
+                                                     * This causes that we leave the ISR and new interrupts are welcome */
+    }
+    INTCONbits.INTF = 0;                        /* Clear interrupt flag */
+
+}
+
+void picinit(void) 
+{
     
     OSCCONbits.IRCF         = 0b110;            /* Set the internal clock speed to 4 MHz */
     OSCCONbits.OSTS         = 0;
