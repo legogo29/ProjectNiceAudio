@@ -44,6 +44,8 @@ void main(void)
     struct matric_29 display1;                  /* Declare the identifier 'display1' to the compiler */                         
     struct matric_29 display2;                  /* Declare the identifier 'display2' to the compiler */
     
+    //display 1 and display 2 are reversed.
+    
     HCMS29struct_s(&display1.BL, &PORTC, 0x06); /* PORTCbits.DS6 is connected to the blank pin of the dot matrix */
     HCMS29struct_s(&display1.RST, &PORTC, 0x02);/* PORTCbits.DS2 is connected to the reset pin of the dot matrix */
     HCMS29struct_s(&display1.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
@@ -54,15 +56,46 @@ void main(void)
     HCMS29struct_s(&display2.CE, &PORTD, 0x04); /* PORTDbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
-    //HCMS29wakeup(display1);
+    PORTDbits.RD6 = 0;
+    
+    config0 conf0;
+    conf0.brightness = PWM18;
+    conf0.current = 0b11;
+    conf0.sleep = 0b1;
+    
+    config1 conf1;
+    conf1.data_out = 0b0;
+    conf1.prescaler = 0b1;
+    
+    /*HCMS29send(display1, ' '); //clear display
+    HCMS29send(display1, ' ');
+    HCMS29send(display1, ' ');
+    HCMS29send(display1, ' ');
+    HCMS29send(display1, ' ');*/
+    
+    HCMS29wakeup(display1);
+
+    
+    HCMS29ctl0(display1, conf0);
+    __delay_ms(100);
+    HCMS29ctl1(display1, conf1);
+    __delay_ms(100);
+    
         
     /*HCMS29send(display1, 0);/*
     HCMS29send(display1, 1);
     HCMS29send(display1, 2);
     HCMS29send(display1, 0x23);
+    HCMS29send(display1, 4);*/
+    HCMS29send(display1, 3);
     HCMS29send(display1, 4);
-    HCMS29send(display1, 5);*/
-    HCMS29send(display1, 0);
+    HCMS29send(display1, 'c');
+    HCMS29send(display1, 'd');
+    HCMS29send(display1, 'e');
+    HCMS29send(display1, 'f');
+    HCMS29send(display1, 'g');
+    HCMS29send(display1, 'h');
+    
 
 //    SSPBUF = 0b11001100;
     

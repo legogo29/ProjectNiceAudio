@@ -3,6 +3,9 @@
 #include "HCMS29.h"                                 
 #include "font.h"                                   /* Contains all the fonts and some custom ones */
 
+#define _XTAL_FREQ  4000000
+
+
 char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask)
 {
     reg->address = address;
@@ -56,6 +59,7 @@ void    HCMS29send(struct matric_29 device, char c)
 //        SSPBUF = TESTARRAY[i]; 
         SSPBUF = CHARACTER_SET[(5*c) + i];
     }
+    __delay_ms(1);
     
     *device.CE.address |= (1 << device.CE.mask);
 }

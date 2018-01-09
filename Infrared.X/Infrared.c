@@ -51,6 +51,8 @@ void main(void)
                                             /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
                                              * Here the Timer1 module will be turned on */ 
     
+    IR                      = 0;
+    
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
     
@@ -65,12 +67,12 @@ void main(void)
         PORTAbits.RA3 = IRbits.D4;
         /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
-        if(!IRbits.D3)
+        if (IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
         {
             /* Then write to port 16 to turn the motor to make the volume higher */
             PORTCbits.RC0 = 0;
             PORTCbits.RC1 = 1; //rechts
-        } else if(IR == VOLUME_DOWN)
+        } else if ((!IRbits.D2)&&(!IRbits.H)) //(IR == VOLUME_DOWN)
         {
             /* Then write to port 15 to turn the motor to make the volume lower */
             PORTCbits.RC1 = 0;
