@@ -55,13 +55,13 @@ void main(void)
     HCMS29struct_s(&display1.RS, &PORTD, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
     config0 conf0;                              /* Configuration for control word 0 register */
-    conf0.brightness = PWM18;
-    conf0.current = 0b11;
-    conf0.sleep = 0b1;
+    conf0.brightness = PWM18;                   /* Set the relative brightness to 30% of what it is capable of */
+    conf0.current = 0b11;                       /* Set the peak current to 12.8 mA */
+    conf0.sleep = 0b1;                          /* Do NOT go in sleep mode */
     
     config1 conf1;                              /* Configuration for control word 1 register */
-    conf1.data_out = 0b0;               
-    conf1.prescaler = 0b1;
+    conf1.data_out = 0b0;                       /* Keep the content of bit D7 (we do not cascade HCMS displays) */
+    conf1.prescaler = 0b1;                      /* Set the internal oscillator prescaler to 1:1 */
     
 
     HCMS29wakeup(display1);                     /* While flashing the HCMS29-xx went in sleep mode. Let's wake it up */
