@@ -59,7 +59,7 @@ void main(void)
     
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
-    
+    PIE1bits.TMR2IE         = 1;            /* Enable Timer2 interrupt (NOTE: only software will trigger) */
     INTCONbits.GIE          = 1;            /* All interrupts have been configured. We can enable the global interrupt */
     
     index   = 0;                            /* Start the index of the array (IRbits) at position 0 */
