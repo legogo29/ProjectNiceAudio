@@ -3,9 +3,6 @@
 #include "HCMS29.h"                                 
 #include "font.h"                                   /* Contains all the fonts and some custom ones */
 
-#define _XTAL_FREQ  4000000
-
-
 char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask)
 {
     reg->address = address;
@@ -49,19 +46,19 @@ void    HCMS29send(struct matric_29 device, char c)
     *device.RS.address &= ~(1 << device.RS.mask);
     *device.CE.address &= ~(1 << device.CE.mask);
     
-    for(int i=0; i < 5; i++)
+    for(int i = 0; i < 5; i++)
     {               
-        if(i != 0)                                      /* Exclude 0 in case SSPIF was no set before the function call */
+        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
         {
             while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
-            //PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
+            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
         }
-//        SSPBUF = TESTARRAY[i]; 
-        SSPBUF = CHARACTER_SET[(5*c) + i];
+
+        SSPBUF = CHARACTER_SET[(5 * c) + i];
     }
-    __delay_ms(1);
+    /* removed __delay_ms(1); */
     
-    *device.CE.address |= (1 << device.CE.mask);
+    *device.CE.address |= (1 << device.CE.mask);    /* Turn on the CE pin (so the data is latched and we can see the LEDs) */
 }
 
 

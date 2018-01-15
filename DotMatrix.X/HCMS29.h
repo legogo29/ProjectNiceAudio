@@ -1,33 +1,24 @@
 #ifndef _HCMS29_H
 #define _HCMS29_H
             
-const char TESTARRAY[5] = {
-  /*  0b01100110,
-    0b01100110,
-    0b01010101,
-    0b01010101,
-    0b01111111*/
-    0xff,0xff,0xff,0xff,0xff
-};
-
 enum
 {
-    PWM0 = 0b0000,
-    PWM1 = 0b0001,
-    PWM2 = 0b0010,
-    PWM3 = 0b0011,
-    PWM4 = 0b0100,
-    PWM5 = 0b0101,
-    PWM7 = 0b0110,
-    PWM9 = 0b0111,
-    PWM11= 0b1000,
-    PWM14= 0b1001,
-    PWM18= 0b1010,
-    PWM22= 0b1011,
-    PWM28= 0b1100,
-    PWM36= 0b1101,
-    PWM48= 0b1110,
-    PWM60= 0b1111
+    PWM0 = 0b0000,                              /* 0% relative brightness */
+    PWM1 = 0b0001,                              /* 1.7% relative brightness */
+    PWM2 = 0b0010,                              /* 3.3% relative brightness */
+    PWM3 = 0b0011,                              /* 5.0% relative brightness */
+    PWM4 = 0b0100,                              /* 6.7 relative brightness */
+    PWM5 = 0b0101,                              /* 8.3% relative brightness */
+    PWM7 = 0b0110,                              /* 11.7% relative brightness */
+    PWM9 = 0b0111,                              /* 15% relative brightness */
+    PWM11= 0b1000,                              /* 18% relative brightness */
+    PWM14= 0b1001,                              /* 23% relative brightness */
+    PWM18= 0b1010,                              /* 30% relative brightness */
+    PWM22= 0b1011,                              /* 37% relative brightness */
+    PWM28= 0b1100,                              /* 47% relative brightness */
+    PWM36= 0b1101,                              /* 60% relative brightness */
+    PWM48= 0b1110,                              /* 80% relative brightness */
+    PWM60= 0b1111                               /* 100% relative brightness */
 };
 
 typedef struct
