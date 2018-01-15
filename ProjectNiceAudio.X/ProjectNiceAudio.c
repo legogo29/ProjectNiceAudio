@@ -66,6 +66,8 @@ void main(void)
     HCMS29ctl1(display1, conf1);
     __delay_ms(100);
     
+    char volume;
+    
     while (1)
     {
         /*
@@ -83,6 +85,8 @@ void main(void)
                 }
             }
         }
+        HCMS29send(display1, '2');
+        //__delay_ms(1000);
     }
 }
 
@@ -193,6 +197,6 @@ void picinit(void)
     IOCBbits.IOCB4      = 1;                    /* Cause IOC for pin 37 */
     
     INTCONbits.RBIE     = 1;                    // Enables the PORTB change interrupt
-    INTCONbits.GIE      = 1;                    /* Enable global interrupts, this should happen after all other setup */
+    INTCONbits.GIE      = 0;                    /* Enable global interrupts, this should happen after all other setup */
 
 }
