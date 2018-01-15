@@ -52,6 +52,7 @@ void main(void)
                                             /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
                                              * Here the Timer1 module will be turned on */ 
     
+    
     IR                      = 0;
     
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
@@ -59,13 +60,18 @@ void main(void)
     
     INTCONbits.GIE          = 1;            /* All interrupts have been configured. We can enable the global interrupt */
     
-    index = 0;                              /* Start the index of the array (IRbits) at position 0 */
+    index   = 0;                            /* Start the index of the array (IRbits) at position 0 */
+    oos     = 0;                            /* Let's assume that we are at init time not out of sync */
+    
     while(1)    
     {
-        PORTAbits.RA0 = IRbits.D1;
-        PORTAbits.RA1 = IRbits.D2;
-        PORTAbits.RA2 = IRbits.D3;
-        PORTAbits.RA3 = IRbits.D4;
+        if(index == 3 && IRbits.C != 0b010) /* If we received 3 bits that are not 0-1-0 we are out of sync */
+        {
+            oos = 1;                        /* Set the out of sync flag */
+            PIR1bits.TMR1IF = 1;            /* Can we trigger an interrupt in software? */
+        }
+        
+        
         /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
         if (IR != 0) { // if new data has been recieved
@@ -126,7 +132,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     if(PIR1bits.TMR1IF)
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
-
+        
         if(PORTBbits.RB0)                   /* If the pin is still high after 0,6 milliseconds */
         {
             IR |= (1<<index);
@@ -139,6 +145,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
         
         index += 1;                         /* Increment the index by 1 (next array position */
         if(index == 12) index = 0;          /* The transmission is complete. Let's point to the begin of the array */
+        
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
     }
 }
@@ -163,7 +170,17 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
  *                                                                                                                                  *
  *  Footnote 4                                                                                                                      *
  *      Timer1 module contains a 16 bit resolution (65 536)                                                                         *
- *      65 536 - 600 = 64936 (this should be the starting value)                                                                   *
+ *      65 536 - 600 = 64936 (this should be the starting value)                                                                    *
  *      (600 * 0,001) = 0.6 milliseconds                                                                                            *
- *                                                                                                                                  *                                                                 
+ *                                                                                                                                  *
+ *  Footnote 5                                                                                                                      *
+ *      Out of sync is when C bits are not on position 0, 1 and 2 of the union but at another place.                                *
+ *      We detect out of sync if the index for writing is 3 and the C bits are not 0-1-0.                                           *
+ *      1 bit transmission takes 1,6 milliseconds. 1 button sends its code 2 times (to be sure it arrives)                          *
+ *      2 * 12 = 24 bits.       24 bits * 1,6 milliseconds = 38.4 milliseconds.                                                     *
+ *      If we detect out of sync we should ignore incomming infrared bits for the duration of 38.4 milliseconds.                    *  
+ * 
+ *  Footnote 6
+ *      38.4 milliseconds is equal to 38400 microseconds
+ *      1 instruction takes 1 microsecond so we need to delay 38400 instructions.                                                                                                                                                                               
  ************************************************************************************************************************************/

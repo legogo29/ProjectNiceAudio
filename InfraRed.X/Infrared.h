@@ -1,7 +1,8 @@
 #ifndef _INFRARED_H
 #define _INFRARED_H
 
-int index;                              /* Used to identify structure members in the array */
+int index;                              /* Used to identify structure members in the union */
+int oos;                                /* Flag which indicates out of sync */
 
 extern volatile unsigned short IR @0x020;
 typedef union 
@@ -29,8 +30,6 @@ typedef union
         unsigned S      : 2;            /* S stands for Single Shot Button.             */
         unsigned D      : 6;            /* D stands for input Data.                     */
     };
-    
-    unsigned *array;                 /* Used to loop through all struct members      */ 
 }IRbits_t;
 extern volatile IRbits_t IRbits @0x020;
 

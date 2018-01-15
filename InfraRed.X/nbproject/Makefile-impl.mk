@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Infrared.X
+PROJECTNAME=InfraRed.X
 
 # Active Configuration
 DEFAULTCONF=default
