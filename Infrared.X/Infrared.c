@@ -18,6 +18,7 @@
 /* Includes */
 #include <xc.h>
 #include "Infrared.h"
+#define _XTAL_FREQ  4000000
 
 
 void main(void) 
@@ -68,7 +69,7 @@ void main(void)
         /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
         if (IR != 0) { // if new data has been recieved
-            if (IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
+            if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
             {
                 /* Then write to port 16 to turn the motor to make the volume higher */
                 PORTCbits.RC0 = 0;
@@ -81,7 +82,7 @@ void main(void)
                 
                 IR = 0;
             }
-            else if ((!IRbits.D2)&&(!IRbits.H)) //(IR == VOLUME_DOWN)
+            else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
             {
                 /* Then write to port 15 to turn the motor to make the volume lower */
                 PORTCbits.RC1 = 0;
