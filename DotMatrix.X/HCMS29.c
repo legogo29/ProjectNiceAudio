@@ -54,7 +54,8 @@ void    HCMS29send(struct matric_29 device, char c)
             PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
         }
 
-        SSPBUF = CHARACTER_SET[(5u * c) + i];
+        //SSPBUF = CHARACTER_SET[(5u * c) + i];
+        SSPBUF = TESTARRAY[i];
     }
     /* removed __delay_ms(1); */
     

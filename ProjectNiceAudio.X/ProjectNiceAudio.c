@@ -66,28 +66,28 @@ void main(void)
     HCMS29ctl1(display1, conf1);
     __delay_ms(100);
     
-    char volume;
+    char volume = 0;
     
     while (1)
     {
         /*
          * ADC
          */
-        if (!GO)
-        {
-            GO = 1;
-            short analog_result = ((short) ADRESH << 8) | ADRESL;
-            for (char i = 0; i < NUMBER_OF_STEPS; i++) {                 //iterate through the LEDS
-                int current_step = STEPSIZE * (i+1);
-                if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
-                    PORTA &= (char) ~(1<<i);                                    //disable the LED if the condition is met
-                    volume = i;
-                } else if (analog_result < (current_step - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
-                    PORTA |= (char) (1<<i);                                     //enable the LED if the condition is met
-                }
-            }
-        }
-        HCMS29send(display1, '2');
+//        if (!GO)
+//        {
+//            GO = 1;
+//            short analog_result = ((short) ADRESH << 8) | ADRESL;
+//            for (char i = 0; i < NUMBER_OF_STEPS; i++) {                 //iterate through the LEDS
+//                int current_step = STEPSIZE * (i+1);
+//                if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
+//                    PORTA &= (char) ~(1<<i);                                    //disable the LED if the condition is met
+//                    volume = i;
+//                } else if (analog_result < (current_step - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
+//                    PORTA |= (char) (1<<i);                                     //enable the LED if the condition is met
+//                }
+//            }
+//        }
+        HCMS29send(display1, volume);
         //__delay_ms(1000);
     }
 }
