@@ -46,16 +46,16 @@ void    HCMS29send(struct matric_29 device, char c)
     *device.RS.address &= ~(1u << device.RS.mask);
     *device.CE.address &= ~(1u << device.CE.mask);
     
-    for(unsigned int i = 0; i < 5; i++)
+//    for(unsigned int i = 0; i < 5; i++)
     {               
-        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
-        {
-            while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
-            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
-        }
+//        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
+//        {
+//            while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
+//            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
+//        }
 
-        //SSPBUF = CHARACTER_SET[(5u * c) + i];
-        SSPBUF = TESTARRAY[i];
+//        SSPBUF = CHARACTER_SET[(5u * c) + i];
+        SSPBUF = TESTARRAY[c];
     }
     /* removed __delay_ms(1); */
     
