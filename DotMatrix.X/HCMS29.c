@@ -46,22 +46,36 @@ void    HCMS29send(struct matric_29 device, char c)
     *device.RS.address &= ~(1u << device.RS.mask);
     *device.CE.address &= ~(1u << device.CE.mask);
     
-//    for(unsigned int i = 0; i < 5; i++)
+    for(unsigned int i = 0; i < 5; i++)
     {               
-//        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
-//        {
-//            while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
-//            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
-//        }
+        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
+        {
+            while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
+            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
+        }
 
-//        SSPBUF = CHARACTER_SET[(5u * c) + i];
-        SSPBUF = TESTARRAY[c];
+        SSPBUF = CHARACTER_SET[(5u * c) + i];
+//        SSPBUF = TESTARRAY[c];
     }
     /* removed __delay_ms(1); */
     
     *device.CE.address |= (1u << device.CE.mask);    /* Turn on the CE pin (so the data is latched and we can see the LEDs) */
 }
 
+void    HCMS29send_string(struct matric_29 device, const unsigned char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++) {
+        HCMS29send(device, str[i]);
+        //__delay_ms(1);
+    }
+}
+
+void    HCMS29send_number(struct matric_29 device, char n) {
+    do {
+        HCMS29send(device, (n % 10u) + '0');
+        n /= 10;
+    } while (n != 0);
+}
 
 void    HCMS29wakeup(struct matric_29 device)
 {

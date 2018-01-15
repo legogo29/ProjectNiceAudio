@@ -66,6 +66,8 @@ void main(void)
     HCMS29ctl1(display1, conf1);
     __delay_ms(100);
     
+    HCMS29send_number(display1, 21);
+    
     char volume = 0;
     
     while (1)
@@ -73,7 +75,6 @@ void main(void)
         /*
          * ADC
          */
-        _nop();
         if (!GO)
         {
             GO = 1;
@@ -82,7 +83,7 @@ void main(void)
                 int current_step = STEPSIZE * (i+1);
                 if ((analog_result > (current_step + HYSTERESIS)) && (analog_result < (current_step + STEPSIZE - HYSTERESIS)))
                 {
-                    volume = i + 1;
+                    volume = i + 1u;
                 }
 //                if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
 //                    PORTA &= (char) ~(1<<i);                                    //disable the LED if the condition is met
@@ -91,7 +92,7 @@ void main(void)
 //                }
             }
         }
-        HCMS29send(display1, volume);
+        //HCMS29send_number(display1, volume);
         __delay_ms(10);
     }
 }

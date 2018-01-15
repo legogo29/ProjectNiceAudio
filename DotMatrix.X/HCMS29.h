@@ -77,6 +77,17 @@ void    HCMS29ctl1(struct matric_29 device, config1 data);
  *  @param c:       The character that needs to be shown (font.h is required) */
 void    HCMS29send(struct matric_29 device, char c);
 
+/*  Use HCMS29send() to sequentially write every char of str to display
+ * 
+ *  @param device:  Copy of the structure members (so the correct pins will be used)
+ *  @param str:     The string that needs to be shown (font.h is required) */
+void    HCMS29send_string(struct matric_29 device, const unsigned char *str);
+
+/*  Use HCMS29send() to sequentially write number to display
+ * 
+ *  @param device:  Copy of the structure members (so the correct pins will be used)
+ *  @param n:       The number that needs to be shown (font.h is required) */
+void    HCMS29send_number(struct matric_29 device, char n);
 
 /*  Wake up the HCMS29xx so the programmer can have influence on the display output
  * 
