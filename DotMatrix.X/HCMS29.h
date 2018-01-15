@@ -37,7 +37,7 @@ typedef struct
 
 struct sfr_member_t
 {                                               
-    unsigned char *address;                     /* Address of the special function register */
+    volatile unsigned char *address;            /* Address of the special function register */
     int mask;                                   /* Offset to access an individual bit */
 };
 
@@ -54,7 +54,7 @@ struct matric_29
  *  @param reg:     A pointer to a struct sfr_member_t 
  *  @param address: The address of the special function register
  *  @param mask:    An offset to set an individual bit of the special function register */
-char    HCMS29struct_s(struct sfr_member_t *reg, const char *address, const int mask);
+void    HCMS29struct_s(struct sfr_member_t *reg, volatile char *address, const int mask);
 
 
 /*  Configure control register 0 (first the display will listen, then it will latch the data)
@@ -87,6 +87,6 @@ void    HCMS29wakeup(struct matric_29 device);
 /*  Turn the display in sleep mode (control words & registers will be set to 0 which results in no output to the user)
  *
  *  @param device:  Copy of the structure members (so the correct pins will be used) */
-void    HCMS29sleep(struct matric_29 device);
+//void    HCMS29sleep(struct matric_29 device);
 
 #endif  /* _HCMS29_H */
