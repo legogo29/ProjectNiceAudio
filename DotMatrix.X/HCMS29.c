@@ -3,6 +3,8 @@
 #include "HCMS29.h"                                 
 #include "font.h"                                   /* Contains all the fonts and some custom ones */
 
+#define _XTAL_FREQ  4000000
+
 void    HCMS29struct_s(struct sfr_member_t *reg, volatile char *address, const int mask)
 {
     reg->address = address;
@@ -55,8 +57,8 @@ void    HCMS29send(struct matric_29 device, char c)
         }
 
         SSPBUF = CHARACTER_SET[(5u * c) + i];
-//        SSPBUF = TESTARRAY[c];
     }
+//    SSPBUF = TESTARRAY[c];
     /* removed __delay_ms(1); */
     
     *device.CE.address |= (1u << device.CE.mask);    /* Turn on the CE pin (so the data is latched and we can see the LEDs) */
@@ -71,11 +73,13 @@ void    HCMS29send_string(struct matric_29 device, const unsigned char *str)
 }
 
 void    HCMS29send_number(struct matric_29 device, char n) {
-    if (n > 10) {
+    if (n >= 10) {
         HCMS29send(device, (n / 10) + '0');
+        __delay_ms(1);
         HCMS29send(device, (n % 10) + '0');
     } else {
         HCMS29send(device, ' ');
+        __delay_ms(1);
         HCMS29send(device, n + '0');
     }
 }

@@ -92,8 +92,8 @@ void main(void)
 //                }
             }
         }
-        //HCMS29send_number(display1, volume);
-        __delay_ms(10);
+        HCMS29send(display1, '0');
+        __delay_ms(1000);
     }
 }
 
