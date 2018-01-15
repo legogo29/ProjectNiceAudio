@@ -30,7 +30,7 @@ void picinit(void);
 void main(void)
 {
     picinit();
-    
+
     /*
      * Setup Displays
      */
@@ -96,11 +96,10 @@ void main(void)
                 }
             }
         }
-        volume++;
 //        HCMS29send_string(display1, "Vol.  ");
 //        HCMS29send_number(display1, volume);
         
-        HCMS29send_string(display2, "Input: ");
+//        HCMS29send_string(display2, "Input: ");
         switch (PORTA & 0b1111) {
             case(0b1110):
                 HCMS29send(display2, '1');
@@ -111,7 +110,7 @@ void main(void)
             case(0b1011):
                 HCMS29send(display2, '3');
                 break;
-            case(~0b0111):
+            case(0b0111):
                 HCMS29send(display2, '4');
                 break;
             default:
