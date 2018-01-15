@@ -58,7 +58,15 @@ void    HCMS29send(struct matric_29 device, char c)
 
         SSPBUF = CHARACTER_SET[(5u * c) + i];
     }
-//    SSPBUF = TESTARRAY[c];
+//    __delay_ms(1);
+//    SSPBUF = 01;
+//    __delay_ms(1);
+//    SSPBUF = 01;
+//    __delay_ms(1);
+//    SSPBUF = 01;
+//    __delay_ms(1);
+//    SSPBUF = 01;
+//    SSPBUF = TESTARRAY[c-'0'];
     /* removed __delay_ms(1); */
     
     *device.CE.address |= (1u << device.CE.mask);    /* Turn on the CE pin (so the data is latched and we can see the LEDs) */

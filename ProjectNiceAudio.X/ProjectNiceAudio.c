@@ -79,21 +79,28 @@ void main(void)
         {
             GO = 1;
             short analog_result = ((short) ADRESH << 8) | ADRESL;
-            for (char i = 0; i < NUMBER_OF_STEPS; i++) {                 //iterate through the LEDS
-                int current_step = STEPSIZE * (i+1);
-                if ((analog_result > (current_step + HYSTERESIS)) && (analog_result < (current_step + STEPSIZE - HYSTERESIS)))
-                {
-                    volume = i + 1u;
+            if (analog_result < STEPSIZE - HYSTERESIS) {
+                volume = 0;
+            } else {
+                for (char i = 1; i < NUMBER_OF_STEPS; i++) {                 //iterate through the LEDS
+                    int current_step = STEPSIZE * (i);
+                    if ((analog_result > (current_step + HYSTERESIS)) && (analog_result < (current_step + STEPSIZE - HYSTERESIS)))
+                    {
+                        volume = i;
+                        break;
+                    }
+//                    if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
+//                        PORTA &= (char) ~(1<<(i-1));                                    //disable the LED if the condition is met
+//                    } else if (analog_result < (current_step - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
+//                        PORTA |= (char) (1<<(i-1));                                     //enable the LED if the condition is met
+//                    }
                 }
-//                if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
-//                    PORTA &= (char) ~(1<<i);                                    //disable the LED if the condition is met
-//                } else if (analog_result < (current_step - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
-//                    PORTA |= (char) (1<<i);                                     //enable the LED if the condition is met
-//                }
             }
         }
-        HCMS29send(display1, '0');
-        __delay_ms(1000);
+        HCMS29send_number(display1, volume);
+        PORTDbits.RD0 = 1; //These two lines are only for Tims test board
+        PORTDbits.RD0 = 0;
+        __delay_ms(10);
     }
 }
 
