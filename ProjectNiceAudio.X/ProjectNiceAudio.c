@@ -25,7 +25,6 @@
 #define HYSTERESIS ((int) (INPUTBITS * 0.01))       //the size of the offset for hysteresis, this is 1% of the input range
 #define STEPSIZE (INPUTBITS / (NUMBER_OF_STEPS+1))  //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
 
-
 void picinit(void);
 
 void main(void)
@@ -97,7 +96,29 @@ void main(void)
                 }
             }
         }
-        HCMS29send_number(display1, volume);
+        volume++;
+//        HCMS29send_string(display1, "Vol.  ");
+//        HCMS29send_number(display1, volume);
+        
+        HCMS29send_string(display2, "Input: ");
+        switch (PORTA & 0b1111) {
+            case(0b1110):
+                HCMS29send(display2, '1');
+                break;
+            case(0b1101):
+                HCMS29send(display2, '2');
+                break;
+            case(0b1011):
+                HCMS29send(display2, '3');
+                break;
+            case(~0b0111):
+                HCMS29send(display2, '4');
+                break;
+            default:
+                HCMS29send(display2, 1);
+                break;
+        }
+//        HCMS29send_number(display2, input);
         PORTDbits.RD0 = 1; //These two lines are only for Tims test board
         PORTDbits.RD0 = 0;
         __delay_ms(10);
@@ -211,6 +232,6 @@ void picinit(void)
     IOCBbits.IOCB4      = 1;                    /* Cause IOC for pin 37 */
     
     INTCONbits.RBIE     = 1;                    // Enables the PORTB change interrupt
-    INTCONbits.GIE      = 0;                    /* Enable global interrupts, this should happen after all other setup */
+    INTCONbits.GIE      = 1;                    /* Enable global interrupts, this should happen after all other setup */
 
 }

@@ -50,13 +50,13 @@ void    HCMS29send(struct matric_29 device, char c)
     
     for(unsigned int i = 0; i < 5; i++)
     {               
-        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
-        {
-            while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
-            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
-        }
-
-        SSPBUF = CHARACTER_SET[(5u * c) + i];
+//        if(i != 0)                                  /* Exclude 0 in case SSPIF was no set before the function call */
+//        {
+//            while(!PIR1bits.SSPIF);                 /* While we did not send the last message successfully */
+//            PIR1bits.SSPIF = 0;                     /* We sent the last message successfully, turn the flag off */
+//        }
+        __delay_us(100);
+        SSPBUF = CHARACTER_SET[(c * 5u) + i];
     }
 //    __delay_ms(1);
 //    SSPBUF = 01;
@@ -82,9 +82,9 @@ void    HCMS29send_string(struct matric_29 device, const unsigned char *str)
 
 void    HCMS29send_number(struct matric_29 device, char n) {
     if (n >= 10) {
-        HCMS29send(device, (n / 10) + '0');
+        HCMS29send(device, (n / 10u) + '0');
         __delay_ms(1);
-        HCMS29send(device, (n % 10) + '0');
+        HCMS29send(device, (n % 10u) + '0');
     } else {
         HCMS29send(device, ' ');
         __delay_ms(1);
