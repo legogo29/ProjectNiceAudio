@@ -67,21 +67,38 @@ void main(void)
         PORTAbits.RA3 = IRbits.D4;
         /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
-        if (IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
-        {
-            /* Then write to port 16 to turn the motor to make the volume higher */
-            PORTCbits.RC0 = 0;
-            PORTCbits.RC1 = 1; //rechts
-        } else if ((!IRbits.D2)&&(!IRbits.H)) //(IR == VOLUME_DOWN)
-        {
-            /* Then write to port 15 to turn the motor to make the volume lower */
-            PORTCbits.RC1 = 0;
-            PORTCbits.RC0 = 1; //links
-        } else 
-        { 
-            /* Put port 15 and 16 down */ 
-            PORTCbits.RC0 = 0;
-            PORTCbits.RC1 = 0;
+        if (IR != 0) { // if new data has been recieved
+            if (IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
+            {
+                /* Then write to port 16 to turn the motor to make the volume higher */
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 1; //rechts
+                
+                __delay_us(100);
+                /* Put port 15 and 16 down */ 
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 0;
+                
+                IR = 0;
+            }
+            else if ((!IRbits.D2)&&(!IRbits.H)) //(IR == VOLUME_DOWN)
+            {
+                /* Then write to port 15 to turn the motor to make the volume lower */
+                PORTCbits.RC1 = 0;
+                PORTCbits.RC0 = 1; //links
+                
+                __delay_us(100);
+                /* Put port 15 and 16 down */ 
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 0;
+                
+                IR = 0;
+            } else 
+            { 
+                /* Put port 15 and 16 down */ 
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 0;
+            }
         }
     }
         

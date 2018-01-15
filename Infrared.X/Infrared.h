@@ -33,6 +33,8 @@ typedef union
     unsigned *array;                 /* Used to loop through all struct members      */ 
 }IRbits_t;
 extern volatile IRbits_t IRbits @0x020;
+
+//THIS IS REVERSED
                     // CCCHSSDDDDDD
 #define VOLUME_UP   (0b010100100000)    /* key number 1, H  is up and D1 */ 
 #define VOLUME_DOWN (0b010100010000)    /* key number 2, H  is up and D2 */
