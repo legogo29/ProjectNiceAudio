@@ -18,10 +18,10 @@
 #include <xc.h>                                     //PIC hardware mapping
 #define _XTAL_FREQ 500000                           //Used by the XC8 delay_ms(x) macro
 
-#define NUMBER_OF_LEDS 4                            //number of LEDs this program will control
+#define NUMBER_OF_STEPS 4                            //number of LEDs this program will control
 #define INPUTBITS 1024                              //the size of the input value
 #define HYSTERESIS ((int) (INPUTBITS * 0.01))       //the size of the offset for hysteresis, this is 1% of the input range
-#define STEPSIZE (INPUTBITS / (NUMBER_OF_LEDS+1))   //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
+#define STEPSIZE (INPUTBITS / (NUMBER_OF_STEPS+1))   //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
 
 void main()
 {
@@ -46,17 +46,19 @@ void main()
     ADCON1bits.ADFM   = 1;                          // Right justify the output
     ADCON1bits.VCFG0  = 0;                          // connect Vref+ to Vss
     ADCON1bits.VCFG1  = 0;                          // connect Vref- to Vdd
-    
+    char volume = 0;
     while (1)
     {
         if (!GO)
         {
             GO = 1;
             short analog_result = ((short) ADRESH << 8) | ADRESL;
-            for (char i = 0; i < 8 /* NUMBER_OF_LEDS*/; i++) {                 //iterate through the LEDS
-                if (analog_result > (STEPSIZE * (i+1) + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
+            for (char i = 0; i < NUMBER_OF_STEPS; i++) {                 //iterate through the LEDS
+                int current_step = STEPSIZE * (i+1);
+                if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
                     PORTA &= ~(1<<i);                                    //disable the LED if the condition is met
-                } else if (analog_result < (STEPSIZE * (i+1) - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
+                    volume = i;
+                } else if (analog_result < (current_step - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
                     PORTA |= (1<<i);                                     //enable the LED if the condition is met
                 }
             }
