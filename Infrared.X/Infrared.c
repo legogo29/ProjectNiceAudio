@@ -18,61 +18,63 @@
 /* Includes */
 #include <xc.h>
 #include "Infrared.h"
+
 #define _XTAL_FREQ  4000000
 
-
-void main(void)
+void main(void) 
 {
     OSCCONbits.IRCF         = 0b110;        /* Set speed to 4 MHz */
     OSCCONbits.OSTS         = 0;            /* An internal oscillat or is used */
     OSCCONbits.SCS          = 0;            /* System clock is determined by the FOSC config bit */
-
+    
     TRISA                   = 0;            /* Configure all A-pins as an output */
     PORTA                   = 0;            /* Turn off all LEDs */
-
+    
     TRISC                   = 0;            /* Configure all C-pins as an output */
     PORTC                   = 0;            /* Turn off motor */
 
     TRISBbits.TRISB0        = 1;            /* Identify pin 33 (RB0) as an input */
     ANSELHbits.ANS12        = 0;            /* Set pin 33 (RB0) to a digital input */
-
+    
     IOCB                    = 0;            /* Disable interrupt-on-change on all B-pins */
     IOCBbits.IOCB0          = 1;            /* Enable interrupt-on-change for pin 33 (RB0) */
-
+    
     INTCON                  = 0;            /* Disable any kind of interrupt */
     INTCONbits.RBIE         = 1;            /* Enable interrupt-on-change on PORTB register */
     INTCONbits.PEIE         = 1;            /* Enable interrupts from the outside (Maybe for IOC?) */
                                             /* NOTE: At this point the global interrupt is not enabled yet */
-
-    T1CON                   = 0;            /* Timer1 is on (not dependent of a gate)
+    
+    T1CON                   = 0;            /* Timer1 is on (not dependent of a gate)    
                                              * Use a 1:1 prescaler
                                              * Do not use a Low-Power oscillator
                                              * Use the internal oscillator / 4 (instruction time)
                                              * Timer1 is off */
-                                            /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred
-                                             * Here the Timer1 module will be turned on */
-
-
+                                            /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
+                                             * Here the Timer1 module will be turned on */ 
+    T2CON                   = 0;            /* Use a 1:1 postscaler
+                                             * Do not turn on the Timer2 module
+                                             * Use a 1:1 prescaler */
+    
     IR                      = 0;
-
+    
     PIE1                    = 0;            /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE         = 1;            /* Enable Timer1 overflow interrupt */
-
+    
     INTCONbits.GIE          = 1;            /* All interrupts have been configured. We can enable the global interrupt */
-
+    
     index   = 0;                            /* Start the index of the array (IRbits) at position 0 */
     oos     = 0;                            /* Let's assume that we are at init time not out of sync */
-
-    while(1)
+    
+    while(1)    
     {
-        if(index == 3 && IRbits.C != 0b010) /* If we received 3 bits that are not 0-1-0 we are out of sync */
+        if(index == 3 && 
+           IRbits.C != 0b010 && !oos)       /* If we received 3 bits that are not 0-1-0 we are out of sync */
         {
-            oos = 1;                        /* Set the out of sync flag */
-            PIR1bits.TMR1IF = 1;            /* Can we trigger an interrupt in software? */
+            PIR1bits.TMR2IF;                /* Trigger an interrupt in-software */
         }
-
-
-        /* Datastring check if it match Volume up */
+        
+        
+        /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
         if (IR != 0) { // if new data has been recieved
             if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
@@ -80,12 +82,12 @@ void main(void)
                 /* Then write to port 16 to turn the motor to make the volume higher */
                 PORTCbits.RC0 = 0;
                 PORTCbits.RC1 = 1; //rechts
-
+                
                 __delay_us(100);
-                /* Put port 15 and 16 down */
+                /* Put port 15 and 16 down */ 
                 PORTCbits.RC0 = 0;
                 PORTCbits.RC1 = 0;
-
+                
                 IR = 0;
             }
             else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
@@ -93,34 +95,31 @@ void main(void)
                 /* Then write to port 15 to turn the motor to make the volume lower */
                 PORTCbits.RC1 = 0;
                 PORTCbits.RC0 = 1; //links
-
+                
                 __delay_us(100);
-                /* Put port 15 and 16 down */
+                /* Put port 15 and 16 down */ 
                 PORTCbits.RC0 = 0;
                 PORTCbits.RC1 = 0;
-
+                
                 IR = 0;
-            } else
-            {
-                /* Put port 15 and 16 down */
+            } else 
+            { 
+                /* Put port 15 and 16 down */ 
                 PORTCbits.RC0 = 0;
                 PORTCbits.RC1 = 0;
             }
         }
     }
-
+        
     return;                                 /* We will never reach this exit point */
 }
 
 
 void interrupt isr()                        /* If any kind of interrupt occurs the program counter is set to this line */
 {
-    //most likely doesn't trigger because flag RBIF doesnt get set on interrupt
-    PORTAbits.RA3 = 1;
-
     if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
     {
-        //PORTAbits.RA3 = 1;
+
         if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
         {
             TMR1 = 64936;                   /* See footnote 3 and footnote 4 */
@@ -128,25 +127,50 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
         }
         INTCONbits.RBIF = 0;                /* Clear the interrupt flag in software. New changes are welcome */
     }
-
+                                            
     if(PIR1bits.TMR1IF)
     {
         T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
         
-        if(PORTBbits.RB0)                   /* If the pin is still high after 0,6 milliseconds */
+        switch(oos)
         {
-            IR |= (1<<index);
-            //IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
-        } else
-        {
-            IR &= ~(1<<index);
-            //IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
+            case 0:
+                if(PORTBbits.RB0)           /* If the pin is still high after 0,6 milliseconds */
+                {
+                    IR |= (1<<index);
+                    //IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
+                } else
+                {
+                    IR &= ~(1<<index);
+                    //IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
+                }
+
+                index += 1;                  /* Increment the index by 1 (next array position */
+                break;
+                
+            case 1:
+                IR = 0;                     /* Remove the corrupt data */
+                index = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
+                
+                oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */
+                INTCONbits.RBIE = 1;        /* We ignored all incoming bits and are synchronized. Incoming bits are welcome */
+                
+                break;
         }
 
-        index += 1;                         /* Increment the index by 1 (next array position */
         if(index == 12) index = 0;          /* The transmission is complete. Let's point to the begin of the array */
-
+ 
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
+    }
+    
+    if(PIR1bits.TMR2IF)
+    {
+        oos = 1;                            /* We are officially out of sync */
+        INTCONbits.RBIE = 0;                /* Ignore all incoming bits from the infrared receiver temporary */
+        TMR1 = 27136;                       /* See footnote 5 and 6 */
+        T1CONbits.TMR1ON = 1;               /* Turn the Timer1 module on */
+        
+        PIR1bits.TMR2IF = 0;                
     }
 }
 
@@ -178,9 +202,12 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
  *      We detect out of sync if the index for writing is 3 and the C bits are not 0-1-0.                                           *
  *      1 bit transmission takes 1,6 milliseconds. 1 button sends its code 2 times (to be sure it arrives)                          *
  *      2 * 12 = 24 bits.       24 bits * 1,6 milliseconds = 38.4 milliseconds.                                                     *
- *      If we detect out of sync we should ignore incomming infrared bits for the duration of 38.4 milliseconds.                    *
- *
- *  Footnote 6
- *      38.4 milliseconds is equal to 38400 microseconds
- *      1 instruction takes 1 microsecond so we need to delay 38400 instructions.
+ *      If we detect out of sync we should ignore incoming infrared bits for the duration of 38.4 milliseconds.                     *  
+ *                                                                                                                                  *
+ *  Footnote 6                                                                                                                      *
+ *      38.4 milliseconds is equal to 38400 microseconds                                                                            *
+ *      1 instruction takes 1 microsecond so we need to delay 38400 instructions.                                                   *
+ *      65 536 - 38 400 = 27 136                                                                                                    *
+ *      TMR1 need to contain the value 27 136                                                                                       *
+ *                                                                                                                                  *     
  ************************************************************************************************************************************/
