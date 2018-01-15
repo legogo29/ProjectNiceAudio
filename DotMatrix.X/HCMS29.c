@@ -71,10 +71,13 @@ void    HCMS29send_string(struct matric_29 device, const unsigned char *str)
 }
 
 void    HCMS29send_number(struct matric_29 device, char n) {
-    do {
-        HCMS29send(device, (n % 10u) + '0');
-        n /= 10;
-    } while (n != 0);
+    if (n > 10) {
+        HCMS29send(device, (n / 10) + '0');
+        HCMS29send(device, (n % 10) + '0');
+    } else {
+        HCMS29send(device, ' ');
+        HCMS29send(device, n + '0');
+    }
 }
 
 void    HCMS29wakeup(struct matric_29 device)

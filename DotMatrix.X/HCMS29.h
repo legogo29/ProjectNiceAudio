@@ -86,7 +86,7 @@ void    HCMS29send_string(struct matric_29 device, const unsigned char *str);
 /*  Use HCMS29send() to sequentially write number to display
  * 
  *  @param device:  Copy of the structure members (so the correct pins will be used)
- *  @param n:       The number that needs to be shown (font.h is required) */
+ *  @param n:       The number that needs to be shown, padded by spaces if less than 10 (cant be over 99) (font.h is required) */
 void    HCMS29send_number(struct matric_29 device, char n);
 
 /*  Wake up the HCMS29xx so the programmer can have influence on the display output
