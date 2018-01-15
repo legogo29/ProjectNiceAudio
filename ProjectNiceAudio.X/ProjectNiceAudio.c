@@ -131,6 +131,7 @@ void interrupt ISR()
      */
     if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
     {
+        __delay_ms(20);
         int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
         
         switch(value)                               /* Determine the direction of the rotary encoer */
