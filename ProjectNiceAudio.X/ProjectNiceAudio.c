@@ -138,7 +138,7 @@ void main(void)
             default:
                 HCMS29send(display2, 1);
                 break;
-        }PORTA = ~(1<<0);
+        }
 //        HCMS29send_number(display2, input);
         PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
         PORTDbits.RD0 = 0;	//Tims Testboard
