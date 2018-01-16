@@ -47,6 +47,8 @@ void main(void)
     HCMS29struct_s(&display2.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
+	// Dit moet nog worden beschreven
+
     PORTDbits.RD6 = 0;
     
     config0 conf0;
