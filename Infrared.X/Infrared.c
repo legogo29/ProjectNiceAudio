@@ -120,7 +120,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
     {
 
-        if(PORTBbits.RB0)                   /* Was the change from negative to positive (rising edge)? */
+        if(PORTBbits.RB0 && !oos)           /* Was the change from negative to positive (rising edge)? And was the signal not oos*/
         {
             TMR1 = 64936;                   /* See footnote 3 and footnote 4 */
             T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
@@ -153,7 +153,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
                 index = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
                 
                 oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */
-                INTCONbits.RBIE = 1;        /* We ignored all incoming bits and are synchronized. Incoming bits are welcome */
+//                INTCONbits.RBIE = 1;        /* We ignored all incoming bits and are synchronized. Incoming bits are welcome */
                 
                 break;
         }
@@ -166,7 +166,7 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
     if(PIR1bits.TMR2IF)
     {
         oos = 1;                            /* We are officially out of sync */
-        INTCONbits.RBIE = 0;                /* Ignore all incoming bits from the infrared receiver temporary */
+//        INTCONbits.RBIE = 0;                /* Ignore all incoming bits from the infrared receiver temporary */
         TMR1 = 27136;                       /* See footnote 5 and 6 */
         T1CONbits.TMR1ON = 1;               /* Turn the Timer1 module on */
         
