@@ -2,6 +2,7 @@
 #define _INFRARED_H
 
 int index;                              /* Used to identify structure members in the union */
+int IRindex;                            /* New name for index */
 int oos;                                /* Flag which indicates out of sync */
 
 extern volatile unsigned short IR @0x020;

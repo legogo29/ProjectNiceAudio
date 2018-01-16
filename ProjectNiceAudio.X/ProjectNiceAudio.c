@@ -78,6 +78,8 @@ void main(void)
     HCMS29send_string(display2, "Input: 1");
     
     char volume = 0;
+    char previousVolume = 0;
+    char targetVolume = 0;
     
     while (1)
     {
@@ -87,6 +89,7 @@ void main(void)
         if (!GO)
         {
             GO = 1;
+            previousVolume == volume; // Set previousVolume
             short analog_result = ((short) ADRESH << 8) | ADRESL;
             if (analog_result < STEPSIZE - HYSTERESIS) {
                 volume = 0;
@@ -105,15 +108,20 @@ void main(void)
 //                    }
                 }
             }
+            if (previousVolume == targetVolume) {
+                targetVolume == volume; /* Sets targetVolume to volume, when they were equal before. */
+            }
         }
-//        HCMS29send_string(display1, "Vol.  ");
-//        HCMS29send_number(display1, volume);
         
+        if (previousVolume != volume) {
+            HCMS29send_string(display1, "Vol.  ");
+            HCMS29send_number(display1, volume);
+        }
         /*
          * Select input
          */
         
-//        HCMS29send_string(display2, "Input: ");
+        HCMS29send_string(display2, "Input: ");
         switch (PORTA & 0b1111) {
             case(0b1110):
                 HCMS29send(display2, '1');
@@ -152,36 +160,34 @@ void main(void)
         if (IR != 0) { // if new data has been recieved
             if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
             {
-                /* Then write to port 16 to turn the motor to make the volume higher */
-                PORTCbits.RC0 = 0;
-                PORTCbits.RC1 = 1; //rechts
-                
-                __delay_us(100);
-                /* Put port 15 and 16 down */ 
-                PORTCbits.RC0 = 0;
-                PORTCbits.RC1 = 0;
+                targetVolume++;
                 
                 IR = 0;
             }
             else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
             {
-                /* Then write to port 15 to turn the motor to make the volume lower */
-                PORTCbits.RC1 = 0;
-                PORTCbits.RC0 = 1; //links
-                
-                __delay_us(100);
-                /* Put port 15 and 16 down */ 
-                PORTCbits.RC0 = 0;
-                PORTCbits.RC1 = 0;
+                targetVolume--;
                 
                 IR = 0;
-            } else 
-            { 
-                /* Put port 15 and 16 down */ 
-                PORTCbits.RC0 = 0;
-                PORTCbits.RC1 = 0;
             }
         }
+        
+        if (targetVolume == volume) {
+            /* Disable motor; put port 15 and 16 down */ 
+            PORTCbits.RC0 = 0;
+            PORTCbits.RC1 = 0;
+        } else if (targetVolume > volume){
+            /* Lower volume
+             * Then write to port 15 to turn the motor to make the volume lower */
+            PORTCbits.RC1 = 0;
+            PORTCbits.RC0 = 1; //links
+        } else if (targetVolume < volume){
+            /* Raise volume
+             * Then write to port 16 to turn the motor to make the volume higher */
+            PORTCbits.RC0 = 0;
+            PORTCbits.RC1 = 1; //rechts
+        }
+        
         __delay_ms(10);
     }
 }
