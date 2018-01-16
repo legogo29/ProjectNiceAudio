@@ -16,6 +16,7 @@
 
 #include <xc.h>      
 #include "../DotMatrix.X/HCMS29.h"
+#include "../Infrared.X/Infrared.h"
 
 #define _XTAL_FREQ  4000000
 
@@ -108,6 +109,10 @@ void main(void)
 //        HCMS29send_string(display1, "Vol.  ");
 //        HCMS29send_number(display1, volume);
         
+        /*
+         * Select input
+         */
+        
 //        HCMS29send_string(display2, "Input: ");
         switch (PORTA & 0b1111) {
             case(0b1110):
@@ -129,49 +134,146 @@ void main(void)
 //        HCMS29send_number(display2, input);
         PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
         PORTDbits.RD0 = 0;	//Tims Testboard
+        
+        /*
+         * Infrared
+         */
+        if(index == 3 && 
+           IRbits.C != 0b010 && !oos)       /* If we received 3 bits that are not 0-1-0 we are out of sync */
+        {
+            oos = 1;                            /* We are  out of sync */
+            TMR1 = 27136;                       /* See footnote 5 and 6 */
+            T1CONbits.TMR1ON = 1;               /* Turn the Timer1 module on */
+        }
+        
+        
+        /* Datastring check if it match Volume up */    
+        //if(IR == VOLUME_UP)
+        if (IR != 0) { // if new data has been recieved
+            if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
+            {
+                /* Then write to port 16 to turn the motor to make the volume higher */
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 1; //rechts
+                
+                __delay_us(100);
+                /* Put port 15 and 16 down */ 
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 0;
+                
+                IR = 0;
+            }
+            else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
+            {
+                /* Then write to port 15 to turn the motor to make the volume lower */
+                PORTCbits.RC1 = 0;
+                PORTCbits.RC0 = 1; //links
+                
+                __delay_us(100);
+                /* Put port 15 and 16 down */ 
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 0;
+                
+                IR = 0;
+            } else 
+            { 
+                /* Put port 15 and 16 down */ 
+                PORTCbits.RC0 = 0;
+                PORTCbits.RC1 = 0;
+            }
+        }
         __delay_ms(10);
     }
 }
 
 void interrupt ISR()
 {
-    /*
-     * Rotary Encoder
-     */
-    if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
+    if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
     {
-        __delay_ms(6);// XXX: THIS IS HERE FOR TESTING, IT IS NOT ACCEPTABLE TO KEEP THIS HERE, SHOULD BE REPLACED BY TIMER
-        int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
-        
-        switch(value)                               /* Determine the direction of the rotary encoer */
+        /*
+         * Rotary Encoder
+         */
+        if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
         {
-            case 1:                                 /* The rotary encoder went clockwise */
-                if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
+            __delay_ms(6);// XXX: THIS IS HERE FOR TESTING, IT IS NOT ACCEPTABLE TO KEEP THIS HERE, SHOULD BE REPLACED BY TIMER
+            int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+
+            switch(value)                               /* Determine the direction of the rotary encoer */
+            {
+                case 1:                                 /* The rotary encoder went clockwise */
+                    if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
+                    {
+                        PORTAbits.RA3 = 1;              // manualy set the new condition
+                        PORTAbits.RA0 = 0;
+                        break;                          // we won't continue to bitshift, because we are already in the desired state
+                    }
+                    PORTA <<= 1;
+                    PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                    break;
+                case 0:                                 /* The rotary encoder went contra clockwise */
+
+                    if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
+                        PORTAbits.RA0 = 1;              // manualy set the new condition
+                        PORTAbits.RA3 = 0;
+                        break;                          // we won't continue to bitshift, because we are already in the desired state
+                    }
+                    PORTA >>= 1;
+                    PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                    break;
+            }
+            __delay_ms(6);
+            INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
+
+        }
+        /*Infrared*/
+        if(PORTBbits.RB0 && !oos)           /* Was the change from negative to positive (rising edge)? And was the signal not oos*/
+        {
+            TMR1 = 64936;                   /* See footnote 3 and footnote 4 */
+            T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
+        }
+        
+        INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
+    }
+    
+    /*
+     * Infrared
+     */
+    
+    if(PIR1bits.TMR1IF)
+    {
+        T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
+        
+        switch(oos)
+        {
+            case 0:
+                if(PORTBbits.RB0)           /* If the pin is still high after 0,6 milliseconds */
                 {
-                    PORTAbits.RA3 = 1;              // manualy set the new condition
-                    PORTAbits.RA0 = 0;
-                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                    IR |= (1<<index);
+                    //IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
+                } else
+                {
+                    IR &= ~(1<<index);
+                    //IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
                 }
-                PORTA <<= 1;
-                PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+
+                index += 1;                  /* Increment the index by 1 (next array position */
                 break;
-            case 0:                                 /* The rotary encoder went contra clockwise */
                 
-                if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
-                    PORTAbits.RA0 = 1;              // manualy set the new condition
-                    PORTAbits.RA3 = 0;
-                    break;                          // we won't continue to bitshift, because we are already in the desired state
-                }
-                PORTA >>= 1;
-                PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+            case 1:
+                IR = 0;                     /* Remove the corrupt data */
+                index = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
+                
+                oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */                
                 break;
         }
-        __delay_ms(6);
-        INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
-                                                     * This causes that we leave the ISR and new interrupts are welcome */
-    }
-    INTCONbits.INTF = 0;                        /* Clear interrupt flag */
 
+        if(index == 12) index = 0;          /* The transmission is complete. Let's point to the begin of the array */
+ 
+        PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
+    }
+    
+    INTCONbits.INTF = 0;                        /* Clear interrupt flag
+                                                 * This causes that we leave the ISR and new interrupts are welcome */
 }
 
 void picinit(void) 
