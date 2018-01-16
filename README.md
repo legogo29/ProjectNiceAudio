@@ -1,4 +1,4 @@
-# ProjectNiceAudio
+![ProjectNiceAudio](https://media.giphy.com/media/xULW8xyaYn1QQN70d2/giphy.gif)
 
 ## Table of Contents
 
