@@ -5,7 +5,9 @@ int index;                              /* Used to identify structure members in
 int IRindex;                            /* New name for index */
 int oos;                                /* Flag which indicates out of sync */
 
-extern volatile unsigned short IR @0x020;
+extern volatile unsigned short IR @0x0EE;
+/* According to http://microchipdeveloper.com/faq:38 absolute variables should be placed at the end of a memory block,
+ * This is placed at the end of bank 1 */
 typedef union 
 {
     struct                              /* Anonymous structure with individual bits     */
@@ -32,7 +34,7 @@ typedef union
         unsigned D      : 6;            /* D stands for input Data.                     */
     };
 }IRbits_t;
-extern volatile IRbits_t IRbits @0x020;
+extern volatile IRbits_t IRbits @0x0EE;
 
 //THIS IS REVERSED
 #if 0
