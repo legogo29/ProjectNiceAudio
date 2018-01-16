@@ -138,7 +138,7 @@ void main(void)
             default:
                 HCMS29send(display2, 1);
                 break;
-        }
+        }PORTA = ~(1<<0);
 //        HCMS29send_number(display2, input);
         PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
         PORTDbits.RD0 = 0;	//Tims Testboard
@@ -161,13 +161,31 @@ void main(void)
             if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
             {
                 targetVolume++;
-                
                 IR = 0;
             }
             else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
             {
                 targetVolume--;
-                
+                IR = 0;
+            }
+            else if (IR == INPUT1)
+            {
+                PORTA = ~(1<<0);
+                IR = 0;
+            }
+            else if (IR == INPUT2)
+            {
+                PORTA = ~(1<<1);
+                IR = 0;
+            }
+            else if (IR == INPUT3)
+            {
+                PORTA = ~(1<<2);
+                IR = 0;
+            }
+            else if (IR == INPUT4)
+            {
+                PORTA = ~(1<<3);
                 IR = 0;
             }
         }
