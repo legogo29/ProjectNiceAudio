@@ -138,7 +138,7 @@ void main(void)
         /*
          * Infrared
          */
-        if(index == 3 && 
+        if(IRindex == 3 && 
            IRbits.C != 0b010 && !oos)       /* If we received 3 bits that are not 0-1-0 we are out of sync */
         {
             oos = 1;                            /* We are  out of sync */
@@ -248,26 +248,26 @@ void interrupt ISR()
             case 0:
                 if(PORTBbits.RB0)           /* If the pin is still high after 0,6 milliseconds */
                 {
-                    IR |= (1<<index);
-                    //IRbits.array[index] = 1;        /* We received a 1. Store this information in our union IRbits */
+                    IR |= (1<<IRindex);
+                    //IRbits.array[IRindex] = 1;        /* We received a 1. Store this information in our union IRbits */
                 } else
                 {
-                    IR &= ~(1<<index);
-                    //IRbits.array[index] = 0;        /* We received a 0. Store this information in our union IRbits */
+                    IR &= ~(1<<IRindex);
+                    //IRbits.array[IRindex] = 0;        /* We received a 0. Store this information in our union IRbits */
                 }
 
-                index += 1;                  /* Increment the index by 1 (next array position */
+                IRindex += 1;                  /* Increment the IRindex by 1 (next array position */
                 break;
                 
             case 1:
                 IR = 0;                     /* Remove the corrupt data */
-                index = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
+                IRindex = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
                 
                 oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */                
                 break;
         }
 
-        if(index == 12) index = 0;          /* The transmission is complete. Let's point to the begin of the array */
+        if(IRindex == 12) IRindex = 0;          /* The transmission is complete. Let's point to the begin of the array */
  
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
     }
@@ -334,16 +334,32 @@ void picinit(void)
      */
     
     INTCONbits.GIE      = 0;                    /* Disables global interrupts */
-    INTCONbits.PEIE     = 0;                    // Disables all peripheral interrupts
     INTCONbits.T0IE     = 0;                    // Disables the Timer0 interrupt
     INTCONbits.INTE     = 0;                    // Disables the INT external interrupt
-    INTCONbits.RBIE     = 0;                    // Disables the PORTB change interrupt
     INTCONbits.INTF     = 0;                    /* Clear flag while flashing */
     INTCONbits.RBIF     = 0;                    // clear flag
     IOCB                = 0;                    // Clear IOCB register,
+    IOCBbits.IOCB0      = 1;                    /* Enable interrupt-on-change for pin 33 (RB0) */
     IOCBbits.IOCB4      = 1;                    /* Cause IOC for pin 37 */
     
     INTCONbits.RBIE     = 1;                    // Enables the PORTB change interrupt
+    INTCONbits.PEIE     = 1;                    /* Enable interrupts from the outside */
     INTCONbits.GIE      = 1;                    /* Enable global interrupts, this should happen after all other setup */
 
+    T1CON               = 0;                    /* Timer1 is on (not dependent of a gate)    
+                                                 * Use a 1:1 prescaler
+                                                 * Do not use a Low-Power oscillator
+                                                 * Use the internal oscillator / 4 (instruction time)
+                                                 * Timer1 is off */
+                                                /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
+                                                 * Here the Timer1 module will be turned on */
+    
+    PIE1                = 0;                    /* Disable all interrupts described in the PIE1 register */
+    PIE1bits.TMR1IE     = 1;                    /* Enable Timer1 overflow interrupt */
+    PIE1bits.TMR2IE     = 1;                    /* Enable Timer2 interrupt (NOTE: only software will trigger) */
+    INTCONbits.GIE      = 1;                    /* All interrupts have been configured. We can enable the global interrupt */
+    
+    IRindex   = 0;                                /* Start the IRindex of the array (IRbits) at position 0 */
+    oos     = 0;                                /* Let's assume that we are at init time not out of sync */
+    IR      = 0;
 }
