@@ -88,7 +88,7 @@ void main(void)
         if (!GO)
         {
             GO = 1;
-            previousVolume == volume; // Set previousVolume
+            previousVolume = volume; // Set previousVolume
             short analog_result = ((short) ADRESH << 8) | ADRESL;
             if (analog_result < STEPSIZE - HYSTERESIS) {
                 volume = 0;
