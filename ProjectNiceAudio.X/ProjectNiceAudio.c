@@ -131,7 +131,7 @@ void interrupt ISR()
      */
     if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
     {
-        __delay_ms(20);
+        __delay_ms(6);// XXX: THIS IS HERE FOR TESTING, IT IS NOT ACCEPTABLE TO KEEP THIS HERE, SHOULD BE REPLACED BY TIMER
         int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
         
         switch(value)                               /* Determine the direction of the rotary encoer */
@@ -157,6 +157,7 @@ void interrupt ISR()
                 PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                 break;
         }
+        __delay_ms(6);
         INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB
                                                      * This causes that we leave the ISR and new interrupts are welcome */
     }
