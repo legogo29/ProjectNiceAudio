@@ -70,7 +70,9 @@ void main(void)
         if(index == 3 && 
            IRbits.C != 0b010 && !oos)       /* If we received 3 bits that are not 0-1-0 we are out of sync */
         {
-            PIR1bits.TMR2IF;                /* Trigger an interrupt in-software */
+            oos = 1;                            /* We are  out of sync */
+            TMR1 = 27136;                       /* See footnote 5 and 6 */
+            T1CONbits.TMR1ON = 1;               /* Turn the Timer1 module on */
         }
         
         
@@ -152,25 +154,13 @@ void interrupt isr()                        /* If any kind of interrupt occurs t
                 IR = 0;                     /* Remove the corrupt data */
                 index = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
                 
-                oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */
-//                INTCONbits.RBIE = 1;        /* We ignored all incoming bits and are synchronized. Incoming bits are welcome */
-                
+                oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */                
                 break;
         }
 
         if(index == 12) index = 0;          /* The transmission is complete. Let's point to the begin of the array */
  
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
-    }
-    
-    if(PIR1bits.TMR2IF)
-    {
-        oos = 1;                            /* We are officially out of sync */
-//        INTCONbits.RBIE = 0;                /* Ignore all incoming bits from the infrared receiver temporary */
-        TMR1 = 27136;                       /* See footnote 5 and 6 */
-        T1CONbits.TMR1ON = 1;               /* Turn the Timer1 module on */
-        
-        PIR1bits.TMR2IF = 0;                
     }
 }
 
