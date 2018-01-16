@@ -48,36 +48,35 @@ void main(void)
     HCMS29struct_s(&display2.CE, &PORTC, 0x04); /* PORTCbits.DS4 is connected to the chip enable pin of the dot matrix */
     HCMS29struct_s(&display2.RS, &PORTC, 0x07); /* PORTCbits.DS7 is connected to the register select pin of the dot matrix */
     
-	// Dit moet nog worden beschreven
+    PORTDbits.RD6 = 0;                          /* Sets blank pin for display 2 low, most likely not needed */
+    
+    config0 conf0;                              /* Configuration for control word 0 register */
+    conf0.brightness = PWM18;                   /* Set the relative brightness to 30% of what it is capable of */
+    conf0.current = 0b11;                       /* Set the peak current to 12.8 mA */
+    conf0.sleep = 0b1;                          /* Do NOT go in sleep mode */
+    
+    config1 conf1;                              /* Configuration for control word 1 register */
+    conf1.data_out = 0b0;                       /* Keep the content of bit D7 (we do not cascade HCMS displays) */
+    conf1.prescaler = 0b1;                      /* Set the internal oscillator prescaler to 1:1 */
+    
+    HCMS29wakeup(display1);                     /* While flashing the HCMS29-xx went in sleep mode. Let's wake it up */
 
-    PORTDbits.RD6 = 0;
+    HCMS29ctl0(display1, conf0);                /* Set control word 0 of the first display */
+    __delay_ms(100);                            /* TODO: Let's try to execute without the delay_ms() */
+    HCMS29ctl1(display1, conf1);                /* Set control word 1 of the first display */
+    __delay_ms(100);                            /* TODO: Let's try to execute without the delay_ms() */
     
-    config0 conf0;
-    conf0.brightness = PWM18;
-    conf0.current = 0b11;
-    conf0.sleep = 0b1;
-    
-    config1 conf1;
-    conf1.data_out = 0b0;
-    conf1.prescaler = 0b1;
-    
-    HCMS29wakeup(display1);
-
-    HCMS29ctl0(display1, conf0);
-    __delay_ms(100);
-    HCMS29ctl1(display1, conf1);
-    __delay_ms(100);
-    
-    HCMS29wakeup(display2);
+    HCMS29wakeup(display2);                     /* Do the same for display 2 */
 
     HCMS29ctl0(display2, conf0);
     __delay_ms(100);
     HCMS29ctl1(display2, conf1);
     __delay_ms(100);
     
-    HCMS29send_string(display2, "Input: 1");
+    HCMS29send_string(display1, "Vol.    ");    /* Initialize display 1 */
+    HCMS29send_string(display2, "Input: 1");    /* Initialize display 2 */
     
-    char volume = 0;
+    char volume = 0;                            /* Initialize some variables for tracking volume */
     char previousVolume = 0;
     char targetVolume = 0;
     
