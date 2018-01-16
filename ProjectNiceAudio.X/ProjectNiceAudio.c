@@ -65,7 +65,14 @@ void main(void)
     HCMS29ctl1(display1, conf1);
     __delay_ms(100);
     
-    HCMS29send_number(display1, 21);
+    HCMS29wakeup(display2);
+
+    HCMS29ctl0(display2, conf0);
+    __delay_ms(100);
+    HCMS29ctl1(display2, conf1);
+    __delay_ms(100);
+    
+    HCMS29send_string(display2, "Input: 1");
     
     char volume = 0;
     
