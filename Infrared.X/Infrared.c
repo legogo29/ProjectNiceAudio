@@ -79,7 +79,7 @@ void main(void)
         /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
         if (IR != 0) { // if new data has been recieved
-            if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
+            if /*(IR == VOLUME_UP) */(IRbits.C == 0b010) ///((!IRbits.D1)&&(!IRbits.H))
             {
                 /* Then write to port 16 to turn the motor to make the volume higher */
                 PORTCbits.RC0 = 0;

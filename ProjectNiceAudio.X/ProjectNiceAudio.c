@@ -26,6 +26,9 @@
 #define HYSTERESIS ((int) (INPUTBITS * 0.01))       //the size of the offset for hysteresis, this is 1% of the input range
 #define STEPSIZE (INPUTBITS / (NUMBER_OF_STEPS+1))  //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
 
+
+    char inputChanged = 0;
+
 void picinit(void);
 
 void main(void)
@@ -74,11 +77,13 @@ void main(void)
     __delay_ms(100);
     
     HCMS29send_string(display2, "Vol.    ");    /* Initialize display 1 */
-    HCMS29send_string(display1AS9N+1, "Input: 1");    /* Initialize display 2 */
+    HCMS29send_string(display1, "Input: 1");    /* Initialize display 2 */
     
     char volume = 0;                            /* Initialize some variables for tracking volume */
     char previousVolume = 0;
     char targetVolume = 0;
+    
+    char inputCounter = 9;
     
     while (1)
     {
@@ -120,27 +125,35 @@ void main(void)
          * Select input
          */
         
-        HCMS29send_string(display1, "Input: ");
-        switch (PORTA & 0b1111) {
-            case(0b1110):
-                HCMS29send(display1, '1');
-                break;
-            case(0b1101):
-                HCMS29send(display1, '2');
-                break;
-            case(0b1011):
-                HCMS29send(display1, '3');
-                break;
-            case(0b0111):
-                HCMS29send(display1, '4');
-                break;
-            default:
-                HCMS29send(display1, 1);
-                break;
+//        inputCounter++;
+        if (inputChanged == 1) { // (inputCounter == 20) {
+            *display1.BL.address |= (1u << display1.BL.mask);
+            HCMS29send_string(display1, "Input: ");
+            switch (PORTA & 0b1111) {
+                case(0b1110):
+                    HCMS29send(display1, '1');
+                    break;
+                case(0b1101):
+                    HCMS29send(display1, '2');
+                    break;
+                case(0b1011):
+                    HCMS29send(display1, '3');
+                    break;
+                case(0b0111):
+                    HCMS29send(display1, '4');
+                    break;
+                default:
+                    HCMS29send(display1, 1);
+                    break;
+            }
+            
+            *display1.BL.address &= ~(1u << display1.BL.mask);
+            inputChanged = 0;
+//            inputCounter = 0;
         }
 //        HCMS29send_number(display1, input);
-        PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
-        PORTDbits.RD0 = 0;	//Tims Testboard
+//        PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
+//        PORTDbits.RD0 = 0;	//Tims Testboard
         
         /*
          * Infrared
@@ -167,28 +180,31 @@ void main(void)
                 targetVolume--;
                 IR = 0;
             }
-            else if (IR == INPUT1)
-            {
-                PORTA = ~(1<<0);
-                IR = 0;
-            }
-            else if (IR == INPUT2)
-            {
-                PORTA = ~(1<<1);
-                IR = 0;
-            }
-            else if (IR == INPUT3)
-            {
-                PORTA = ~(1<<2);
-                IR = 0;
-            }
-            else if (IR == INPUT4)
-            {
-                PORTA = ~(1<<3);
-                IR = 0;
-            }
+//            else if (IR == INPUT1)
+//            {
+//                PORTA = ~(1<<0);
+//                inputChanged = 1;
+//                IR = 0;
+//            }
+//            else if (IR == INPUT2)
+//            {
+//                PORTA = ~(1<<1);
+//                inputChanged = 1;
+//                IR = 0;
+//            }
+//            else if (IR == INPUT3)
+//            {
+//                PORTA = ~(1<<2);
+//                inputChanged = 1;
+//                IR = 0;
+//            }
+//            else if (IR == INPUT4)
+//            {
+//                PORTA = ~(1<<3);
+//                inputChanged = 1;
+//                IR = 0;
+//            }
         }
-        
         if (targetVolume == volume) {
             /* Disable motor; put port 15 and 16 down */ 
             PORTCbits.RC0 = 0;
@@ -244,6 +260,8 @@ void interrupt ISR()
                     PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                     break;
             }
+            
+            inputChanged = 1;
             __delay_ms(6);
             INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
 
