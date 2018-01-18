@@ -81,7 +81,7 @@ void main(void)
     
     char volume = 0;                            /* Initialize some variables for tracking volume */
     char previousVolume = 0;
-    char targetVolume = 0;
+    char targetVolume = 20;
     
     char inputCounter = 9;
     
@@ -180,41 +180,41 @@ void main(void)
                 targetVolume--;
                 IR = 0;
             }
-//            else if (IR == INPUT1)
-//            {
-//                PORTA = ~(1<<0);
-//                inputChanged = 1;
-//                IR = 0;
-//            }
-//            else if (IR == INPUT2)
-//            {
-//                PORTA = ~(1<<1);
-//                inputChanged = 1;
-//                IR = 0;
-//            }
-//            else if (IR == INPUT3)
-//            {
-//                PORTA = ~(1<<2);
-//                inputChanged = 1;
-//                IR = 0;
-//            }
-//            else if (IR == INPUT4)
-//            {
-//                PORTA = ~(1<<3);
-//                inputChanged = 1;
-//                IR = 0;
-//            }
+            else if (IR == INPUT1)
+            {
+                PORTA = ~(1<<0);
+                inputChanged = 1;
+                IR = 0;
+            }
+            else if (IR == INPUT2)
+            {
+                PORTA = ~(1<<1);
+                inputChanged = 1;
+                IR = 0;
+            }
+            else if (IR == INPUT3)
+            {
+                PORTA = ~(1<<2);
+                inputChanged = 1;
+                IR = 0;
+            }
+            else if (IR == INPUT4)
+            {
+                PORTA = ~(1<<3);
+                inputChanged = 1;
+                IR = 0;
+            }
         }
         if (targetVolume == volume) {
             /* Disable motor; put port 15 and 16 down */ 
             PORTCbits.RC0 = 0;
             PORTCbits.RC1 = 0;
-        } else if (targetVolume > volume){
+        } else if (targetVolume < volume){
             /* Lower volume
              * Then write to port 15 to turn the motor to make the volume lower */
             PORTCbits.RC1 = 0;
             PORTCbits.RC0 = 1; //links
-        } else if (targetVolume < volume){
+        } else if (targetVolume > volume){
             /* Raise volume
              * Then write to port 16 to turn the motor to make the volume higher */
             PORTCbits.RC0 = 0;
