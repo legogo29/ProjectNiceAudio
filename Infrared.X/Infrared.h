@@ -55,20 +55,20 @@ extern volatile IRbits_t IRbits @0x0EE;
 
 //This is right
                     // DDDDDDSSHCCC
-#define VOLUME_UP   (0b000001001010)    /* key number 1, H  is up and D1 */ 
-#define VOLUME_DOWN (0b000010001010)    /* key number 2, H  is up and D2 */
-#define INPUT1      (0b000010010010)    /* key number 8, S1 is up and D2 */
-#define INPUT2      (0b000100001010)    /* key number 3, H  is up and D3 */
-#define INPUT3      (0b000001010010)    /* key number 7, S1 is up and D1 */
-#define INPUT4      (0b000100010010)    /* key number 9, S1 is up and D3 */  
+//#define VOLUME_UP   (0b000001001010)    /* key number 1, H  is up and D1 */ 
+//#define VOLUME_DOWN (0b000010001010)    /* key number 2, H  is up and D2 */
+//#define INPUT1      (0b000010010010)    /* key number 8, S1 is up and D2 */
+//#define INPUT2      (0b000100001010)    /* key number 3, H  is up and D3 */
+//#define INPUT3      (0b000001010010)    /* key number 7, S1 is up and D1 */
+//#define INPUT4      (0b000100010010)    /* key number 9, S1 is up and D3 */  
 
 //                    // DDDDDDSSHCCC
-//#define VOLUME_UP   (0b111110110101)    /* key number 1, H  is up and D1 */ 
-//#define VOLUME_DOWN (0b111101110101)    /* key number 2, H  is up and D2 */
-//#define INPUT1      (0b111101101101)    /* key number 8, S1 is up and D2 */
-//#define INPUT2      (0b111011110101)    /* key number 3, H  is up and D3 */
-//#define INPUT3      (0b111110101101)    /* key number 7, S1 is up and D1 */
-//#define INPUT4      (0b111011101101)    /* key number 9, S1 is up and D3 */  
+#define VOLUME_UP   (0b111110110101)    /* key number 1, H  is up and D1 */ 
+#define VOLUME_DOWN (0b111101110101)    /* key number 2, H  is up and D2 */
+#define INPUT1      (0b111101101101)    /* key number 8, S1 is up and D2 */
+#define INPUT2      (0b111011110101)    /* key number 3, H  is up and D3 */
+#define INPUT3      (0b111110101101)    /* key number 7, S1 is up and D1 */
+#define INPUT4      (0b111011101101)    /* key number 9, S1 is up and D3 */  
 
 /* naar rechts draaien is volume_up. dat is RC0 */
 /* naar links draaien is volume_down. dat is RC1 */

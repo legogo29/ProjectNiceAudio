@@ -79,29 +79,29 @@ void main(void)
         /* Datastring check if it match Volume up */    
         //if(IR == VOLUME_UP)
         if (IR != 0) { // if new data has been recieved
-            if /*(IR == VOLUME_UP) */(IRbits.C == 0b010) ///((!IRbits.D1)&&(!IRbits.H))
+            if /*(IR == VOLUME_UP) */(IRbits.D == 0b100000) ///((!IRbits.D1)&&(!IRbits.H))
             {
                 /* Then write to port 16 to turn the motor to make the volume higher */
                 PORTCbits.RC0 = 0;
                 PORTCbits.RC1 = 1; //rechts
                 
-                __delay_us(100);
-                /* Put port 15 and 16 down */ 
-                PORTCbits.RC0 = 0;
-                PORTCbits.RC1 = 0;
+//                __delay_us(100);
+//                /* Put port 15 and 16 down */ 
+//                PORTCbits.RC0 = 0;
+//                PORTCbits.RC1 = 0;
                 
                 IR = 0;
             }
-            else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
+            else if /*((!IRbits.D2)&&(!IRbits.H))*/ /*(IR == VOLUME_DOWN)*/ (IRbits.D == 0b010000)
             {
                 /* Then write to port 15 to turn the motor to make the volume lower */
                 PORTCbits.RC1 = 0;
                 PORTCbits.RC0 = 1; //links
                 
-                __delay_us(100);
-                /* Put port 15 and 16 down */ 
-                PORTCbits.RC0 = 0;
-                PORTCbits.RC1 = 0;
+//                __delay_us(100);
+//                /* Put port 15 and 16 down */ 
+//                PORTCbits.RC0 = 0;
+//                PORTCbits.RC1 = 0;
                 
                 IR = 0;
             } else 
