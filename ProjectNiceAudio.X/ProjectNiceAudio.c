@@ -83,7 +83,7 @@ void main(void)
     char previousVolume = 0;
     char targetVolume = 20;
     
-    char inputCounter = 9;
+//    char inputCounter = 9;
     
     while (1)
     {
@@ -92,7 +92,7 @@ void main(void)
          */
         if (!GO)
         {
-            GO = 1;
+            GO = 1; // this should probably be after setting analog_result
             previousVolume = volume; // Set previousVolume
             short analog_result = ((short) ADRESH << 8) | ADRESL;
             if (analog_result < STEPSIZE - HYSTERESIS) {
@@ -113,7 +113,7 @@ void main(void)
                 }
             }
             if (previousVolume == targetVolume) {
-                targetVolume == volume; /* Sets targetVolume to volume, when they were equal before. */
+                targetVolume = volume; /* Sets targetVolume to volume, when they were equal before. */
             }
         }
         
