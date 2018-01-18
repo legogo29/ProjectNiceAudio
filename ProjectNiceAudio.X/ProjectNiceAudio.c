@@ -258,6 +258,10 @@ void interrupt ISR()
         INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
     }
     
+    if (PIR1bits.TMR2IF) {
+        
+    }
+    
     /*
      * Infrared
      */
@@ -376,13 +380,53 @@ void picinit(void)
                                                  * Timer1 is off */
                                                 /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
                                                  * Here the Timer1 module will be turned on */
+    T2CON               = 0;                    /* Use a 1:1 postscaler
+                                                 * Do not turn on the Timer2 module */
+    T2CONbits.T2CKPS    = 0b01;                 /* Use a 1:4 prescaler */
     
     PIE1                = 0;                    /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE     = 1;                    /* Enable Timer1 overflow interrupt */
-    PIE1bits.TMR2IE     = 1;                    /* Enable Timer2 interrupt (NOTE: only software will trigger) */
+    PIE1bits.TMR2IE     = 1;                    /* Enable Timer2 interrupt */
     INTCONbits.GIE      = 1;                    /* All interrupts have been configured. We can enable the global interrupt */
     
     IRindex   = 0;                                /* Start the IRindex of the array (IRbits) at position 0 */
     oos     = 0;                                /* Let's assume that we are at init time not out of sync */
     IR      = 0;
 }
+
+
+/************************************************************************************************************************************
+ *                                                                                                                                  *
+ *  Footnote 1                                                                                                                      *
+ *      Our clock speed is 4 MHz (4 000 000 Hz). This means that we execute (4 000 000 / 4) 1 000 000 instructions per second       *
+ *      1 instruction takes (1 / 1 000 000) 0,000 001 second per instruction. This is equal to 0,001 milliseconds                   *
+ *                                                                                                                                  *
+ *  Footnote 2                                                                                                                      *
+ *      When a 0 is received pin 33 is HIGH for 0,4 milliseconds                                                                    *
+ *      When a 1 is received pin 33 is HIGH for 1.2 milliseconds                                                                    *
+ *      Let's start a timer module and generate an interrupt after 0,6 milliseconds, so we have some slack.                         *
+ *      If the pin is still high we received a 1.                                                                                   *
+ *                                                                                                                                  *
+ *  Footnote 3                                                                                                                      *
+ *      Every 0,001 microsecond the Timer1 module adds 1. Our goal is give an interrupt after 0.5 milliseconds                      *
+ *      0.6 = 0,001 * x     (x is 600)                                                                                              *
+ *                                                                                                                                  *
+ *  Footnote 4                                                                                                                      *
+ *      Timer1 module contains a 16 bit resolution (65 536)                                                                         *
+ *      65 536 - 600 = 64936 (this should be the starting value)                                                                    *
+ *      (600 * 0,001) = 0.6 milliseconds                                                                                            *
+ *                                                                                                                                  *
+ *  Footnote 5                                                                                                                      *
+ *      Out of sync is when C bits are not on position 0, 1 and 2 of the union but at another place.                                *
+ *      We detect out of sync if the index for writing is 3 and the C bits are not 0-1-0.                                           *
+ *      1 bit transmission takes 1,6 milliseconds. 1 button sends its code 2 times (to be sure it arrives)                          *
+ *      2 * 12 = 24 bits.       24 bits * 1,6 milliseconds = 38.4 milliseconds.                                                     *
+ *      If we detect out of sync we should ignore incoming infrared bits for the duration of 38.4 milliseconds.                     *  
+ *                                                                                                                                  *
+ *  Footnote 6                                                                                                                      *
+ *      38.4 milliseconds is equal to 38400 microseconds                                                                            *
+ *      1 instruction takes 1 microsecond so we need to delay 38400 instructions.                                                   *
+ *      65 536 - 38 400 = 27 136                                                                                                    *
+ *      TMR1 need to contain the value 27 136                                                                                       *
+ *                                                                                                                                  *     
+ ************************************************************************************************************************************/
