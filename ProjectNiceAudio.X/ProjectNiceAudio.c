@@ -26,6 +26,8 @@
 #define HYSTERESIS ((int) (INPUTBITS * 0.01))       //the size of the offset for hysteresis, this is 1% of the input range
 #define STEPSIZE (INPUTBITS / (NUMBER_OF_STEPS+1))  //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
 
+char rotaryDebaunce = 0;
+
 void picinit(void);
 
 void main(void)
@@ -216,34 +218,13 @@ void interrupt ISR()
         /*
          * Rotary Encoder
          */
-        if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
+        if(!PORTBbits.RB4 && rotaryDebaunce == 0)        /* Is the interrupt caused by external interrupt on PORTB? */
         {
-            __delay_ms(6);// XXX: THIS IS HERE FOR TESTING, IT IS NOT ACCEPTABLE TO KEEP THIS HERE, SHOULD BE REPLACED BY TIMER
-            int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
-
-            switch(value)                               /* Determine the direction of the rotary encoer */
-            {
-                case 1:                                 /* The rotary encoder went clockwise */
-                    if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
-                    {
-                        PORTAbits.RA3 = 1;              // manualy set the new condition
-                        PORTAbits.RA0 = 0;
-                        break;                          // we won't continue to bitshift, because we are already in the desired state
-                    }
-                    PORTA <<= 1;
-                    PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
-                    break;
-                case 0:                                 /* The rotary encoder went contra clockwise */
-
-                    if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
-                        PORTAbits.RA0 = 1;              // manualy set the new condition
-                        PORTAbits.RA3 = 0;
-                        break;                          // we won't continue to bitshift, because we are already in the desired state
-                    }
-                    PORTA >>= 1;
-                    PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
-                    break;
-            }
+            rotaryDebaunce = 1;
+            TMR2 = 134;                                 /* See footnote 7 and footnote 8 */
+            T2CONbits.TMR2ON = 1;                       /* Turn on the Timer2 module */
+            //__delay_ms(6);// XXX: THIS IS HERE FOR TESTING, IT IS NOT ACCEPTABLE TO KEEP THIS HERE, SHOULD BE REPLACED BY TIMER
+            
             __delay_ms(6);
             INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
 
@@ -259,7 +240,41 @@ void interrupt ISR()
     }
     
     if (PIR1bits.TMR2IF) {
-        
+        switch (rotaryDebaunce) {
+            case 2:
+                rotaryDebaunce = 0;
+                T1CONbits.TMR1ON = 0;           /* Turn on the Timer1 module */
+                break;
+            case 1:
+                int value = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+
+                switch(value)                               /* Determine the direction of the rotary encoer */
+                {
+                    case 1:                                 /* The rotary encoder went clockwise */
+                        if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
+                        {
+                            PORTAbits.RA3 = 1;              // manualy set the new condition
+                            PORTAbits.RA0 = 0;
+                            break;                          // we won't continue to bitshift, because we are already in the desired state
+                        }
+                        PORTA <<= 1;
+                        PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                        break;
+                    case 0:                                 /* The rotary encoder went contra clockwise */
+
+                        if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
+                            PORTAbits.RA0 = 1;              // manualy set the new condition
+                            PORTAbits.RA3 = 0;
+                            break;                          // we won't continue to bitshift, because we are already in the desired state
+                        }
+                        PORTA >>= 1;
+                        PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                        break;
+                }
+                rotaryDebaunce = 2;
+                TMR2 = 134;                                 /* See footnote 7 and footnote 8 */
+                break;
+        }
     }
     
     /*
