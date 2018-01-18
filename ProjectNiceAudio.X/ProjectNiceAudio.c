@@ -73,8 +73,8 @@ void main(void)
     HCMS29ctl1(display2, conf1);
     __delay_ms(100);
     
-    HCMS29send_string(display1, "Vol.    ");    /* Initialize display 1 */
-    HCMS29send_string(display2, "Input: 1");    /* Initialize display 2 */
+    HCMS29send_string(display2, "Vol.    ");    /* Initialize display 1 */
+    HCMS29send_string(display1AS9N+1, "Input: 1");    /* Initialize display 2 */
     
     char volume = 0;                            /* Initialize some variables for tracking volume */
     char previousVolume = 0;
@@ -113,32 +113,32 @@ void main(void)
         }
         
         if (previousVolume != volume) {
-            HCMS29send_string(display1, "Vol.  ");
-            HCMS29send_number(display1, volume);
+            HCMS29send_string(display2, "Vol.  ");
+            HCMS29send_number(display2, volume);
         }
         /*
          * Select input
          */
         
-        HCMS29send_string(display2, "Input: ");
+        HCMS29send_string(display1, "Input: ");
         switch (PORTA & 0b1111) {
             case(0b1110):
-                HCMS29send(display2, '1');
+                HCMS29send(display1, '1');
                 break;
             case(0b1101):
-                HCMS29send(display2, '2');
+                HCMS29send(display1, '2');
                 break;
             case(0b1011):
-                HCMS29send(display2, '3');
+                HCMS29send(display1, '3');
                 break;
             case(0b0111):
-                HCMS29send(display2, '4');
+                HCMS29send(display1, '4');
                 break;
             default:
-                HCMS29send(display2, 1);
+                HCMS29send(display1, 1);
                 break;
         }
-//        HCMS29send_number(display2, input);
+//        HCMS29send_number(display1, input);
         PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
         PORTDbits.RD0 = 0;	//Tims Testboard
         
