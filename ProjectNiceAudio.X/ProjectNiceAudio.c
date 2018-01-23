@@ -27,7 +27,7 @@
 #define STEPSIZE (INPUTBITS / (NUMBER_OF_STEPS+1))  //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
 
 
-char inputChanged = 0;
+char input_changed = 0;                         /* Indicates wether the input channel has been changed or not [0 = no changed] [1 = changed] */
 
 void picinit(void);
 
@@ -79,57 +79,57 @@ void main(void)
     HCMS29send_string(display2, "Vol.    ");    /* Initialize display 1 */
     HCMS29send_string(display1, "Input: 1");    /* Initialize display 2 */
     
-    char volume = 0;                            /* Initialize some variables for tracking volume */
-    char previousVolume = 0;
-    char targetVolume = 20;
-    
-//    char inputCounter = 9;
+    char volume_now     = 0;                    /* Initialize some variables for tracking volume */
+    char volume_prev    = 0;
+    char volume_targ    = 20;
     
     while (1)
     {
         /*
          * ADC
          */
-        if (!GO)
+        if(!GO)
         {
-            GO = 1; // this should probably be after setting analog_result
-            previousVolume = volume; // Set previousVolume
-            short analog_result = ((short) ADRESH << 8) | ADRESL;
-            if (analog_result < STEPSIZE - HYSTERESIS) {
-                volume = 0;
-            } else {
-                for (char i = 1; i < NUMBER_OF_STEPS; i++) {                 //iterate through the LEDS
+            GO = 1;                             // This should probably be after setting analog_result
+            volume_prev = volume_now;           // Assign to volume_prev
+            short analog_result = ((short) ADRESH << 8) | ADRESL; 
+            if (analog_result < STEPSIZE - HYSTERESIS) 
+            {
+                volume_now = 0;                 /* Set volume to 0 if it's in the first 'region' */
+            } else 
+            {
+                for(char i = 1; i < NUMBER_OF_STEPS; i++) 
+                {                               /* Iterate through all the 'regions' */
                     int current_step = STEPSIZE * (i);
-                    if ((analog_result > (current_step + HYSTERESIS)) && (analog_result < (current_step + STEPSIZE - HYSTERESIS)))
-                    {
-                        volume = i;
+                    if((analog_result > (current_step + HYSTERESIS)) && 
+                       (analog_result < (current_step + STEPSIZE - HYSTERESIS)))
+                    {                           /* We found a matched region! Assign it to the current volume */
+                        volume_now = i;
                         break;
                     }
-//                    if (analog_result > (current_step + HYSTERESIS)) {         //test if the dial is past the breaking point for the step
-//                        PORTA &= (char) ~(1<<(i-1));                                    //disable the LED if the condition is met
-//                    } else if (analog_result < (current_step - HYSTERESIS)) {  //test if the dial is before the breaking point for the step
-//                        PORTA |= (char) (1<<(i-1));                                     //enable the LED if the condition is met
-//                    }
                 }
             }
-            if (previousVolume == targetVolume) {
-                targetVolume = volume; /* Sets targetVolume to volume, when they were equal before. */
+            if(volume_prev == volume_targ) 
+            {
+                volume_prev = volume_now;       /* Sets volume_target to volume_now, when they were equal before. */
             }
         }
         
-        if (previousVolume != volume) {
+        if (volume_prev != volume_now)          /* We need to update the volume. The screen prints outdated information */
+        {
             HCMS29send_string(display2, "Vol.  ");
-            HCMS29send_number(display2, volume);
+            HCMS29send_number(display2, volume_now);
         }
         /*
          * Select input
          */
-        
-//        inputCounter++;
-        if (inputChanged == 1) { // (inputCounter == 20) {
+
+        if (input_changed == 1)                 /* If the input channel has been changed, we need to update our information to the user */
+        {                                       /* Set the blank pin temporarry, so the user won't see the shifts */
             *display1.BL.address |= (1u << display1.BL.mask);
             HCMS29send_string(display1, "Input: ");
-            switch (PORTA & 0b1111) {
+            switch (PORTA & 0b1111) 
+            {
                 case(0b1110):
                     HCMS29send(display1, '1');
                     break;
@@ -146,14 +146,11 @@ void main(void)
                     HCMS29send(display1, 1);
                     break;
             }
-            
+                                                /* Do not blank the display anymore. Our updated information is ready to be displayed! */
             *display1.BL.address &= ~(1u << display1.BL.mask);
-            inputChanged = 0;
-//            inputCounter = 0;
+            input_changed = 0;                  /* Clear the input_changed flag since we took action */
         }
-//        HCMS29send_number(display1, input);
-//        PORTDbits.RD0 = 1; 	//Tims Testboard - These two lines are only for Tims test board
-//        PORTDbits.RD0 = 0;	//Tims Testboard
+
         
         /*
          * Infrared
@@ -167,58 +164,58 @@ void main(void)
         }
         
         
-        /* Datastring check if it match Volume up */    
-        //if(IR == VOLUME_UP)
-        if (IR != 0) { // if new data has been recieved
-            if (IR == VOLUME_UP) //(IRbits.C == 0b101) ///((!IRbits.D1)&&(!IRbits.H))
+  
+        if(IR != 0) {                           // if new data has been recieved
+            if(IR == VOLUME_UP)                
             {
-                targetVolume++;
-                IR = 0;
+                volume_targ++;
+                IR = 0;                         /* Clear the received data, so we won't take another action on the same data */
             }
-            else if /*((!IRbits.D2)&&(!IRbits.H))*/ (IR == VOLUME_DOWN)
+            else if(IR == VOLUME_DOWN)
             {
-                targetVolume--;
-                IR = 0;
+                volume_targ--;
+                IR = 0;                         /* Clear the received data, so we won't take another action on the same data */
             }
-            else if (IR == INPUT1)
+            else if(IR == INPUT1)
             {
-                PORTA = ~(1<<0);
-                inputChanged = 1;
-                IR = 0;
+                PORTA = ~(1 << 0);
+                input_changed = 1;              /* Since we changed the input, this flag need to be set so our information on the display will be updated */
+                IR = 0;                         /* Clear the received data, so we won't take another action on the same data */
             }
-            else if (IR == INPUT2)
+            else if(IR == INPUT2)
             {
-                PORTA = ~(1<<1);
-                inputChanged = 1;
-                IR = 0;
+                PORTA = ~(1 << 1);
+                input_changed = 1;              /* Since we changed the input, this flag need to be set so our information on the display will be updated */
+                IR = 0;                         /* Clear the received data, so we won't take another action on the same data */
+            }   
+            else if(IR == INPUT3)
+            {
+                PORTA = ~(1 << 2);
+                input_changed = 1;              /* Since we changed the input, this flag need to be set so our information on the display will be updated */
+                IR = 0;                         /* Clear the received data, so we won't take another action on the same data */
             }
-            else if (IR == INPUT3)
+            else if(IR == INPUT4)
             {
-                PORTA = ~(1<<2);
-                inputChanged = 1;
-                IR = 0;
-            }
-            else if (IR == INPUT4)
-            {
-                PORTA = ~(1<<3);
-                inputChanged = 1;
-                IR = 0;
+                PORTA = ~(1 << 3);
+                input_changed = 1;              /* Since we changed the input, this flag need to be set so our information on the display will be updated */
+                IR = 0;                         /* Clear the received data, so we won't take another action on the same data */
             }
         }
-        if (targetVolume == volume) {
-            /* Disable motor; put port 15 and 16 down */ 
+        
+        
+        
+        if (volume_targ == volume_now) 
+        {                                       /* Disable motor; put port 15 and 16 down */ 
             PORTCbits.RC0 = 0;
             PORTCbits.RC1 = 0;
-        } else if (targetVolume < volume){
-            /* Lower volume
-             * Then write to port 15 to turn the motor to make the volume lower */
-            PORTCbits.RC1 = 0;
-            PORTCbits.RC0 = 1; //links
-        } else if (targetVolume > volume){
-            /* Raise volume
-             * Then write to port 16 to turn the motor to make the volume higher */
-            PORTCbits.RC0 = 0;
-            PORTCbits.RC1 = 1; //rechts
+        } else if (volume_targ < volume_now)
+        {                                       /* Lower volume then write to port 15 to turn the motor to make the volume lower */
+            PORTCbits.RC1 = 0;                  /* Turn the motor anticlockwise */
+            PORTCbits.RC0 = 1; 
+        } else if (volume_targ > volume_now)
+        {                                       /* Raise volume then write to port 16 to turn the motor to make the volume higher */
+            PORTCbits.RC0 = 0;                  /* Turn the motor clockwise */
+            PORTCbits.RC1 = 1; 
         }
         
         __delay_ms(10);
@@ -227,26 +224,26 @@ void main(void)
 
 void interrupt ISR()
 {
-    if(INTCONbits.RBIF)                     /* The voltage on pin 33 (RB0) changed */
+    if(INTCONbits.RBIF)                         /* The voltage on pin 33 (RB0) changed */
     {
         /*
          * Rotary Encoder
          */
-        if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
+        if(!PORTBbits.RB4)                      /* Is the interrupt caused by external interrupt on PORTB? */
         {
-            TMR2 = 5;                               /* Export a new start value to increment from for the next time */
-            T2CONbits.TMR2ON = 1;                       /* Turn on the Timer2 module. This creates the delay we want */
-            INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
+            TMR2 = 5;                           /* Export a new start value to increment from for the next time */
+            T2CONbits.TMR2ON = 1;               /* Turn on the Timer2 module. This creates the delay we want */
+            INTCONbits.RBIF = 0;                /* Clear the interrupt flag for RB */
 
         }
         /*Infrared*/
-        if(PORTBbits.RB0 && !oos)           /* Was the change from negative to positive (rising edge)? And was the signal not oos*/
+        if(PORTBbits.RB0 && !oos)               /* Was the change from negative to positive (rising edge)? And was the signal not oos*/
         {
-            TMR1 = 64936;                   /* See footnote 3 and footnote 4 */
-            T1CONbits.TMR1ON = 1;           /* Turn on the Timer1 module */
+            TMR1 = 64936;                       /* See footnote 3 and footnote 4 */
+            T1CONbits.TMR1ON = 1;               /* Turn on the Timer1 module */
         }
         
-        INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
+        INTCONbits.RBIF = 0;                    /* Clear the interrupt flag for RB */
     }
     
     /*
@@ -255,68 +252,67 @@ void interrupt ISR()
     
     if(PIR1bits.TMR1IF)
     {
-        T1CONbits.TMR1ON = 0;               /* Stop the Timer1 module (so not another interrupts will occur and wait) */
+        T1CONbits.TMR1ON = 0;                   /* Stop the Timer1 module (so not another interrupts will occur and wait) */
         
         switch(oos)
         {
             case 0:
-                if(PORTBbits.RB0)           /* If the pin is still high after 0,6 milliseconds */
+                if(PORTBbits.RB0)               /* If the pin is still high after 0,6 milliseconds */
                 {
-                    IR |= (1<<IRindex);
-                    //IRbits.array[IRindex] = 1;        /* We received a 1. Store this information in our union IRbits */
+                    IR |= (1 << IRindex);       /* We received a 1. Store this information in our union IRbits */    
                 } else
-                {
-                    IR &= ~(1<<IRindex);
-                    //IRbits.array[IRindex] = 0;        /* We received a 0. Store this information in our union IRbits */
+                {                               
+                    IR &= ~(1 << IRindex);      /* We received a 0. Store this information in our union IRbits */      
                 }
 
-                IRindex += 1;                  /* Increment the IRindex by 1 (next array position */
+                IRindex += 1;                   /* Increment the IRindex by 1 (next array position */
                 break;
                 
             case 1:
-                IR = 0;                     /* Remove the corrupt data */
-                IRindex = 0;                  /* Next time we receive a bit, save it at the first location (so we are sync) */
+                IR = 0;                         /* Remove the corrupt data */
+                IRindex = 0;                    /* Next time we receive a bit, save it at the first location (so we are sync) */
                 
-                oos = 0;                    /* Clear the out of sync flag since we are not out of sync anymore. */                
+                oos = 0;                        /* Clear the out of sync flag since we are not out of sync anymore. */                
                 break;
         }
 
         if(IRindex == 12) IRindex = 0;          /* The transmission is complete. Let's point to the begin of the array */
  
-        PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
+        PIR1bits.TMR1IF = 0;                    /* Clear the interrupt flag in software (so we leave the isr) */
     }
     
     if(PIR1bits.TMR2IF)
     {
-        T2CONbits.TMR2ON = 0;                       /* Turn off the Timer2 module so it won't count anymore */
+        T2CONbits.TMR2ON = 0;                   /* Turn off the Timer2 module so it won't count anymore */
         
-        int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+        int value   = PORTBbits.RB5;            /* Isolate the measured voltage on pin 38 (rotary B) */
 
-        switch(value)                               /* Determine the direction of the rotary encoer */
+        switch(value)                           /* Determine the direction of the rotary encoer */
         {
-            case 1:                                 /* The rotary encoder went clockwise */
-                if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
+            case 1:                             /* The rotary encoder went clockwise */
+                if(!PORTAbits.RA3)              // If Input 4 was on, we should rollover
                 {
-                    PORTAbits.RA3 = 1;              // manualy set the new condition
+                    PORTAbits.RA3 = 1;          // manualy set the new condition
                     PORTAbits.RA0 = 0;
-                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                    break;                      // we won't continue to bitshift, because we are already in the desired state
                 }
                 PORTA <<= 1;
-                PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                PORTAbits.RA0 = 1;              // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                 break;
-            case 0:                                 /* The rotary encoder went contra clockwise */
+            case 0:                             /* The rotary encoder went contra clockwise */
 
-                if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
-                    PORTAbits.RA0 = 1;              // manualy set the new condition
+                if(!PORTAbits.RA0) {            // If Input 4 was on, we should rollover
+                    PORTAbits.RA0 = 1;          // manualy set the new condition
                     PORTAbits.RA3 = 0;
-                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                    break;                      // we won't continue to bitshift, because we are already in the desired state
                 }
                 PORTA >>= 1;
-                PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                PORTAbits.RA7 = 1;              // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
                 break;
             }
-            
-        inputChanged = 1; 
+        
+        __delay_ms(6);                          /* NOTE: this REALLY BAD practice. We shame ourselves, but this is the only chance we have */
+        input_changed = 1; 
         PIR1bits.TMR2IF = 0;
     }
     
@@ -410,7 +406,7 @@ void picinit(void)
     PIE1bits.TMR2IE     = 1;                    /* Enable Timer2 interrupt (NOTE: only software will trigger) */
     INTCONbits.GIE      = 1;                    /* All interrupts have been configured. We can enable the global interrupt */
     
-    IRindex   = 0;                              /* Start the IRindex of the array (IRbits) at position 0 */
+    IRindex = 0;                                /* Start the IRindex of the array (IRbits) at position 0 */
     oos     = 0;                                /* Let's assume that we are at init time not out of sync */
-    IR      = 0;
+    IR      = 0;                                /* Remove garbage data in the union. This is best practice */
 }
