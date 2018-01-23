@@ -58,15 +58,7 @@ void    HCMS29send(struct matric_29 device, char c)
         __delay_us(100);
         SSPBUF = CHARACTER_SET[(c * 5u) + i];
     }
-//    __delay_ms(1);
-//    SSPBUF = 01;
-//    __delay_ms(1);
-//    SSPBUF = 01;
-//    __delay_ms(1);
-//    SSPBUF = 01;
-//    __delay_ms(1);
-//    SSPBUF = 01;
-//    SSPBUF = TESTARRAY[c-'0'];
+
     /* removed __delay_ms(1); */
     
     *device.CE.address |= (1u << device.CE.mask);    /* Turn on the CE pin (so the data is latched and we can see the LEDs) */
@@ -74,20 +66,23 @@ void    HCMS29send(struct matric_29 device, char c)
 
 void    HCMS29send_string(struct matric_29 device, const unsigned char *str)
 {
-    for (int i = 0; str[i] != '\0'; i++) {
+    for (int i = 0; str[i] != '\0'; i++) 
+    {
         HCMS29send(device, str[i]);
-        //__delay_ms(1);
     }
 }
 
-void    HCMS29send_number(struct matric_29 device, char n) {
-    if (n >= 10) {
+void    HCMS29send_number(struct matric_29 device, char n) 
+{
+    if (n >= 10) 
+    {
         HCMS29send(device, (n / 10u) + '0');
-        __delay_ms(1);
+        /*__delay_ms(1); unnecessary since we have a delay in HCMS29send() already */
         HCMS29send(device, (n % 10u) + '0');
-    } else {
+    } else 
+    {
         HCMS29send(device, ' ');
-        __delay_ms(1);
+       /*__delay_ms(1); unnecessary since we have a delay in HCMS29send() already */
         HCMS29send(device, n + '0');
     }
 }
@@ -101,9 +96,9 @@ void    HCMS29wakeup(struct matric_29 device)
     config.sleep = 0b1;                             /* Do not sleep */
     
     
-    *device.RST.address |= (1u << device.RST.mask);  /* Set the reset pin to logic HIGH (so it does not reset again) */
-    *device.RS.address &= ~(1u << device.RS.mask);   /* Select  the dot register */
-    *device.CE.address &= ~(1u << device.CE.mask);   /* Enable chip (and RS will be latched, because falling edge of this pin) */
+    *device.RST.address |= (1u << device.RST.mask); /* Set the reset pin to logic HIGH (so it does not reset again) */
+    *device.RS.address &= ~(1u << device.RS.mask);  /* Select  the dot register */
+    *device.CE.address &= ~(1u << device.CE.mask);  /* Enable chip (and RS will be latched, because falling edge of this pin) */
     
     /* Should probably be (320 / 8) is 40 */
     for(int i = 0; i < 320; i++)                    
@@ -111,14 +106,8 @@ void    HCMS29wakeup(struct matric_29 device)
         SSPBUF = 0b00000000;                        /* Each clock send 0s to the dot register */
     }
     
-    *device.CE.address |= (1u << device.CE.mask);    /* Set to logic high so data will be latched. */
+    *device.CE.address |= (1u << device.CE.mask);   /* Set to logic high so data will be latched. */
     HCMS29ctl0(device, config);                     /* Export the sleep bit logic high to control register 0 */
 }
 
 
-//void    HCMS29sleep(struct matric_29 device)
-//{
-//    *device.RST.address &= ~(1 << device.RST.mask); /* Turn off the RESET pin (it's active LOW so the display will sleep) *
-//                                                     * The dot register is still there, but blanked (so the user will not see the output) 
-//                                                     * The control register and control words are all 0s now */
-//}
