@@ -27,7 +27,7 @@
 #define STEPSIZE (INPUTBITS / (NUMBER_OF_STEPS+1))  //the size of the steps between intervals there has to be accounted for an extra LED, because there has to be an equal empty space at the end
 
 
-    char inputChanged = 0;
+char inputChanged = 0;
 
 void picinit(void);
 
@@ -159,7 +159,7 @@ void main(void)
          * Infrared
          */
         if(IRindex == 3 && 
-           IRbits.C != 0b010 && !oos)       /* If we received 3 bits that are not 0-1-0 we are out of sync */
+           IRbits.C != 0b010 && !oos)           /* If we received 3 bits that are not 0-1-0 we are out of sync */
         {
             oos = 1;                            /* We are  out of sync */
             TMR1 = 27136;                       /* See footnote 5 and 6 */
@@ -234,35 +234,8 @@ void interrupt ISR()
          */
         if(!PORTBbits.RB4)                               /* Is the interrupt caused by external interrupt on PORTB? */
         {
-            __delay_ms(6);// XXX: THIS IS HERE FOR TESTING, IT IS NOT ACCEPTABLE TO KEEP THIS HERE, SHOULD BE REPLACED BY TIMER
-            int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
-
-            switch(value)                               /* Determine the direction of the rotary encoer */
-            {
-                case 1:                                 /* The rotary encoder went clockwise */
-                    if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
-                    {
-                        PORTAbits.RA3 = 1;              // manualy set the new condition
-                        PORTAbits.RA0 = 0;
-                        break;                          // we won't continue to bitshift, because we are already in the desired state
-                    }
-                    PORTA <<= 1;
-                    PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
-                    break;
-                case 0:                                 /* The rotary encoder went contra clockwise */
-
-                    if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
-                        PORTAbits.RA0 = 1;              // manualy set the new condition
-                        PORTAbits.RA3 = 0;
-                        break;                          // we won't continue to bitshift, because we are already in the desired state
-                    }
-                    PORTA >>= 1;
-                    PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
-                    break;
-            }
-            
-            inputChanged = 1;
-            __delay_ms(6);
+            TMR2 = 5;                               /* Export a new start value to increment from for the next time */
+            T2CONbits.TMR2ON = 1;                       /* Turn on the Timer2 module. This creates the delay we want */
             INTCONbits.RBIF = 0;                        /* Clear the interrupt flag for RB */
 
         }
@@ -311,6 +284,40 @@ void interrupt ISR()
         if(IRindex == 12) IRindex = 0;          /* The transmission is complete. Let's point to the begin of the array */
  
         PIR1bits.TMR1IF = 0;                /* Clear the interrupt flag in software (so we leave the isr) */
+    }
+    
+    if(PIR1bits.TMR2IF)
+    {
+        T2CONbits.TMR2ON = 0;                       /* Turn off the Timer2 module so it won't count anymore */
+        
+        int value   = PORTBbits.RB5;                /* Isolate the measured voltage on pin 38 (rotary B) */
+
+        switch(value)                               /* Determine the direction of the rotary encoer */
+        {
+            case 1:                                 /* The rotary encoder went clockwise */
+                if(!PORTAbits.RA3)                  // If Input 4 was on, we should rollover
+                {
+                    PORTAbits.RA3 = 1;              // manualy set the new condition
+                    PORTAbits.RA0 = 0;
+                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                }
+                PORTA <<= 1;
+                PORTAbits.RA0 = 1;                  // Set RA0 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                break;
+            case 0:                                 /* The rotary encoder went contra clockwise */
+
+                if(!PORTAbits.RA0) {                // If Input 4 was on, we should rollover
+                    PORTAbits.RA0 = 1;              // manualy set the new condition
+                    PORTAbits.RA3 = 0;
+                    break;                          // we won't continue to bitshift, because we are already in the desired state
+                }
+                PORTA >>= 1;
+                PORTAbits.RA7 = 1;                  // Set RA7 off, when bitshifting, a 0 was shifted in here, we want a 1 because the output will be inverted.
+                break;
+            }
+            
+        inputChanged = 1; 
+        PIR1bits.TMR2IF = 0;
     }
     
     INTCONbits.INTF = 0;                        /* Clear interrupt flag
@@ -394,13 +401,16 @@ void picinit(void)
                                                  * Timer1 is off */
                                                 /* NOTE: The value in register TMR1H and TMR1L is set once a IOC occurred 
                                                  * Here the Timer1 module will be turned on */
+    T2CON               = 0b00101001;           /* Use a 1:4 prescaler
+                                                 * Use a 1:6 postscaler
+                                                 * Do not turn the Timer2 module on */
     
     PIE1                = 0;                    /* Disable all interrupts described in the PIE1 register */
     PIE1bits.TMR1IE     = 1;                    /* Enable Timer1 overflow interrupt */
     PIE1bits.TMR2IE     = 1;                    /* Enable Timer2 interrupt (NOTE: only software will trigger) */
     INTCONbits.GIE      = 1;                    /* All interrupts have been configured. We can enable the global interrupt */
     
-    IRindex   = 0;                                /* Start the IRindex of the array (IRbits) at position 0 */
+    IRindex   = 0;                              /* Start the IRindex of the array (IRbits) at position 0 */
     oos     = 0;                                /* Let's assume that we are at init time not out of sync */
     IR      = 0;
 }
